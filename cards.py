@@ -67,7 +67,7 @@ class Player:
 x=0
 while x<amount_of_players:
     player=Player()
-    x=x+1
+    
     
         
 
