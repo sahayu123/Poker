@@ -1,9 +1,17 @@
-import random
-cards=list()
-for i in [" of Clubs"," of Diamonds", " of Hearts"," of Spades"]:
-    for j in["Ace","2","3","4","5","6","7","8","9","10","Jack","Queen","King"]:
-        cards.append(j+i)
+
+from player import Player
+from cards import Card
+from deck import Deck
+from hand import Hand 
 
 
-  
-
+players_list=list()  
+num_players=5
+for o in range(num_players):
+    players_list.append(Player())
+print("this is player list", players_list)    
+deck=Deck()
+deck.shuffle()
+deck1=deck.deal(num_players,players_list)
+hand = Hand(players_list,deck1)
+hand.preflop()
