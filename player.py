@@ -5,8 +5,11 @@ class Player:
         self.money=100
         self.round_status=None
         self.player_bet=0
-        self.name=input("please enter name:")
-
+        self.player_bet_hand=0
+        #self.name=input("please enter name:")
+        names=["b","c","d","e","f"]
+        self.name=names[0]
+        names.remove(self.name)
 
 
 
