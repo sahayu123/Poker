@@ -4,11 +4,13 @@ from cards import Card
 from player import Player     
 class Deck():
     def __init__(self):
+        '''The init methord of the Deck class creates a deck and appends it to a list.'''
         self.deck3=list()
         for i in ["Clubs","Diamonds", "Hearts","Spades"]:
             for j in["Ace","2","3","4","5","6","7","8","9","10","Jack","Queen","King"]:
                 self.deck3.append({"suit":i,"number":j})
     def shuffle(self):
+        '''The shuffle methord of the Deck class shuffles the deck and makes each individual card an object.'''
         z=51
         x=0
         self.deck_shuffled=list()
@@ -24,7 +26,12 @@ class Deck():
         # print("shuffled deck",self.deck_shuffled)
         #print("")
 
+
     def deal(self,num_players,players_list):
+        '''The deal method of the Deck class deals to cards to each player.
+            It takes the number of players as the first parameter.
+            It takes the list of players as the second parameter.
+            It returns the shuffled deck.'''
         #print("this is players list inside deal", players_list)
         l=51
         for nbm in range(num_players):
