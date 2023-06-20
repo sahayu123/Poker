@@ -5,3 +5,13 @@ class Card():
             It takes the number as parameter two'''
         self.suit=suit
         self.number=number
+        if self.number=="Jack":
+            self.number_value=11
+        elif self.number=="Queen":
+            self.number_value=12
+        elif self.number=="King":
+            self.number_value=13
+        elif self.number=="Ace":
+            self.number_value=1  
+        else:
+            self.number_value=int(self.number)

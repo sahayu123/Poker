@@ -2,6 +2,7 @@ import pytest
 from hand import Hand
 from player import Player
 from deck import Deck
+from cards import Card
 
 def test_input_function():
     hand_pot_values=[8,0,10,5]
@@ -55,7 +56,7 @@ def test_input_function():
 
 def test_check_function():
     j=0
-    cont_values=["NO","NO","YES","NO","YES"]
+    cont_values=["NO","WON","YES","NO","YES","YES"]
     while j<len(cont_values):
         players_list=list()
         num_players=5
@@ -93,3 +94,51 @@ def test_check_function():
         assert cont_value==cont_values[j]
         j=j+1
        
+def test_check_straight_flush():
+    players_list=list()
+    player=Player()
+    players_list.append(player)
+    player=Player()
+    players_list.append(player)
+    deck=Deck()
+    deck.shuffle()
+    deck1=deck.deal(1,players_list)
+    hand=Hand(deck1,players_list)
+    
+    player_one_card=[Card("Clubs","6"),
+                     Card("Clubs","9"),
+                     Card("Clubs","Jack"),
+                     Card("Clubs","2"),
+                     Card("Clubs","8"),
+                     Card("Clubs","Ace")]
+
+    player_two_card=[Card("Clubs","9"),
+                    Card("Clubs","10"),
+                    Card("Clubs","10"),
+                    Card("Hearts","3"),
+                    Card("Clubs","4"),
+                    Card("Clubs","King")]
+    
+    community_cards=[[Card("Clubs","7"),Card("Clubs","2"),Card("Clubs","8"),Card("Clubs","10"),Card("Clubs","5")],
+                     [Card("Clubs","7"),Card("Clubs","2"),Card("Clubs","8"),Card("Clubs","Jack"),Card("Clubs","5")],
+                    [Card("Hearts","7"),Card("Spades","2"),Card("Clubs","8"),Card("Clubs","Queen"),Card("Clubs","9")],
+                    [Card("Hearts","7"),Card("Spades","2"),Card("Clubs","8"),Card("Clubs","Queen"),Card("Clubs","9")],
+                    [Card("Hearts","7"),Card("Spades","2"),Card("Clubs","8"),Card("Clubs","Queen"),Card("Clubs","9")],
+                    [Card("Hearts","7"),Card("Spades","2"),Card("Clubs","Jack"),Card("Clubs","Queen"),Card("Clubs","10")]
+ ]
+ 
+    results=[True,True,True,False,False,True]
+    x=0
+    while x<len(player_two_card):
+
+        players_list[0].card_one=player_one_card[x]
+        players_list[0].card_two=player_two_card[x]
+   
+        hand=Hand(players_list,deck1)
+        hand.community_cards=community_cards[x]
+        print("This is community cards",hand.community_cards)
+    
+        j=hand.check_straight_flush(players_list[0])
+        print("this is test",x)
+        assert j==results[x]
+        x=x+1

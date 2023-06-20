@@ -1,5 +1,5 @@
 import random
-
+from cards import Card
 class Hand():
     def __init__(self,player_list,deck):
         '''The init method of the hand class intitializes the attrbitutes of the hand.
@@ -215,29 +215,25 @@ class Hand():
             #print(v.round_status)
             if v.round_status=="Fold":
                 jaz=jaz+1
-                #print(jaz)
+                print(jaz)
                 if jaz==len(players_list)-1:
                     for g in players_list:
                         if g.round_status!="Fold":
                             g.round_status="Won_hand"
+                            g.money=g.money+self.round_pot
                             print(g.name,"wins")
+                            print(g.name,"has amount",g.money)
                             stab="NO" 
                             break  
                                         
-                continue
+        for v in players_list:
             if stab=="NO":
                 check="NO"
-                cont="NO"
+                cont="WON"
                 return cont
             elif v.round_status==None:
                 check="NO"
                 break  
-                
-                #elif v.round_status=="BIG":
-                    #check="NO"
-                    #break
-                #print(v.player_bet)
-            #print(v)
             jst.append(v.player_bet_hand)
             mk.append(v)
 
@@ -267,12 +263,13 @@ class Hand():
             1. The first parameter is the amout of community cards needed to be dealt in the round
             2. The second parameter is the list of players
             3. The third parameter  takes an input of YES or NO, if YES is entered blind values are intialized, if NO is entered,there will be no blind values. '''
+        
         players_list=player_list.copy()
         self.community_cards_deal(amount_cards,players_list)
         z=self.blinds_check(blinds)
-        while z < len(players_list):
+        while z < len(players_list):            
             if players_list[z].round_status=="Fold":
-                print("This is fold z",z)
+                #print("This is fold z",z)
                 z=(z+1)%len(players_list)
                 continue
             self.imput_options(players_list,z)
@@ -289,25 +286,198 @@ class Hand():
                 z=(z+1)%len(players_list)
 
             cont=self.round_check(players_list)
+            print(cont)
             if cont=="YES":
                 continue
             elif cont=="NO":
                 break
+            elif cont=="WON":
+                return "NO_NEW_ROUND"
+    
+    def check_straight_method(self,f,x,g):
+        #print("This is x",x)
+        #print("This is f list",f)
+        while x<g:
+            if f[x]==f[x+1]-1:
+                print("Checking this ",f[x],"and this",f[x+1])
+                straight=True
+            else:
+                straight=False
+                return straight,None        
+            x=x+1
+        return straight,f
+
+
+    def check_flush(self,p):       
+        suit_count=dict()
+        suit_count["Diamonds"]=[0,[]] 
+        suit_count["Clubs"]=[0,[]]    
+        suit_count["Spades"]=[0,[]]    
+        suit_count["Hearts"]=[0,[]]    
+           
+        for x in self.community_cards:
+            #print("This is x number",x.number)
+            print("This is x suit",x.suit,"This is x number",x.number)
+            suit_count[x.suit][0]=suit_count[x.suit][0]+1
+            suit_count[x.suit][1].append(x)
+
+        suit_count[p.card_one.suit][0]=suit_count[p.card_one.suit][0]+1
+        suit_count[p.card_one.suit][1].append(p.card_one)   
+        print("This is card 1 suit",p.card_one.suit,"This is card 1 number",p.card_one.number)
+        suit_count[p.card_two.suit][0]=suit_count[p.card_two.suit][0]+1
+        suit_count[p.card_two.suit][1].append(p.card_two) 
+        print("This is card 2 suit",p.card_one.suit,"This is card 2 number",p.card_one.number)
+        print("gibs")
+        if suit_count["Clubs"][0]>=5:
+            #print("This is suit_count lenght",len(suit_count["Clubs"][1]))
+            return "FLUSH",suit_count["Clubs"][1]
+
+        elif suit_count["Hearts"][0]>=5:
+            return "FLUSH",suit_count["Hearts"][1]
+                 
+        elif suit_count["Diamonds"][0]>=5:
+            return "FLUSH",suit_count["Diamonds"][1]
+            
+        elif suit_count["Spades"][0]>=5:
+            return "FLUSH",suit_count["Spades"][1]
+        else:
+            return "NO_FLUSH",None
+    
+    def check_straight(self,p,cards):
+        f=list()
+        for item in cards:
+            if item.number=="Ace":
+                New_ace=Card(item.suit,"Ace")
+                New_ace.number_value=14
+                f.append(New_ace.number_value)
+
+            f.append(item.number_value)
+        f.sort()
+         
+        #print("This is f lenght",len(f))
+        print("This is f",f)
+        if len(f)==5:
+            straight=self.check_straight_method(f,0,4)
+            return straight[0],straight[1]
+            
+        elif len(f)==6:
+            straight=self.check_straight_method(f,1,5)
+                
+            if straight[0]==False:
+
+                straight=self.check_straight_method(f,0,4)
+
+                if straight[0]==True:
+                    f.remove(f[5])
+                    return straight[0],f
+                elif straight[0]==False:
+                    return straight[0],None
+
+            else:
+                f.remove(f[0])
+                return straight[0],f
+
+        elif len(f)==7:
+            straight=self.check_straight_method(f,2,6)
+            print("straight 1",straight)
+
+            if straight[0]==False:
+                straight=self.check_straight_method(f,1,5)
+                print("straight 2",straight)
+            else:
+                f.remove(f[1])
+                f.remove(f[0])
+                return straight[0],f
+            if straight[0]==False:
+                straight=self.check_straight_method(f,0,4)
+                print("straight 3",straight)
+                if straight[0]==False:
+                    return straight,None
+                elif straight[0]==True:
+                    f.remove(f[6])
+                    f.remove(f[5])
+                    return straight,f
+            else:
+                f.remove(f[6])
+                f.remove(f[0])
+                return straight,f
+      
+        elif len(f)==8:
+
+            straight=self.check_straight_method(f,3,7)
+            print("straight 1",straight)
+            #tick
+
+            if straight[0]==False:
+                straight=self.check_straight_method(f,2,6)
+                print("straight 2",straight)
+            else:
+                f.remove(f[2])
+                f.remove(f[1])
+                f.remove(f[0])
+                return straight[0],f
+            #tick
+            if straight[0]==False:
+                straight=self.check_straight_method(f,1,5)
+                print("straight 3",straight)
+            else:
+                f.remove(f[7])
+                f.remove(f[1])
+                f.remove(f[0])
+                return straight[0],f
+            #tick
+            if straight[0]==False:
+                straight=self.check_straight_method(f,0,4)
+                print("straight 4",straight)
+                if straight[0]==False:
+                    return straight,None
+                elif straight[0]==True:
+                    f.remove(f[7])
+                    f.remove(f[6])
+                    f.remove(f[5])
+                    return straight,f
+            else:
+                f.remove(f[7])
+                f.remove(f[6])
+                f.remove(f[0])
+                return straight,f
+
+    def check_straight_flush(self,p):  
+        val=self.check_flush(p)
+        if val[0]=="NO_FLUSH":
+            return False
+        elif val[0]=="FLUSH":
+            bol=self.check_straight(p,val[1])
+            print("THIS IS BOL",bol[1])
+        if bol[0]==True:
+            return True
+        if bol[0]==False:
+            return False
+
+
+                #return "STRAIGHT_FLUSH"
+
+    def check_winner(self,players_list):
+        for p in players_list:
+            p=self.check_straight_flush(players_list)
 
     def preflop(self):
         '''The preflop method of the Hand class implemets betting for the preflop round'''
-        self.round_betting(0,self.players_list,"YES")    
+        self.new_round=self.round_betting(0,self.players_list,"YES")    
     
     def flop(self):
         '''The flop method of the Hand class implements betting for the flop round'''
-        self.round_betting(3,self.players_in_game,"NO")
+        if self.new_round != "NO_NEW_ROUND":
+            self.new_round=self.round_betting(3,self.players_in_game,"NO")
     
     def turn(self):
         '''The turn method of the Hand class implements betting for the turn round'''
-
-        self.round_betting(1,self.players_in_game,"NO")   
+        if self.new_round != "NO_NEW_ROUND":
+           self.new_round= self.round_betting(1,self.players_in_game,"NO")   
     
     def river(self):
         '''The river method of the Hand class implements betting for the river round'''
-
-        self.round_betting(1,self.players_in_game,"NO")   
+        if self.new_round != "NO_NEW_ROUND":
+            self.new_round=self.round_betting(1,self.players_in_game,"NO")   
+            if self.new_round !="NOw_NEW_ROUND":
+                self.check_winner(self.players_in_game)

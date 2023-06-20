@@ -13,6 +13,7 @@ class Player:
         names=["b","c","d","e","f"]
         self.name=names[0]
         names.remove(self.name)
+        
 
 
 
