@@ -131,7 +131,6 @@ def test_check_straight_flush():
     results=[True,True,True,False,False,True]
     x=0
     while x<len(player_two_card):
-
         players_list[0].card_one=player_one_card[x]
         players_list[0].card_two=player_two_card[x]
    
@@ -141,6 +140,7 @@ def test_check_straight_flush():
     
         j=hand.check_straight_flush(players_list[0])
         print("this is test",x)
+        print("This is J",j)
         assert j[0]==results[x]
         x=x+1
 
@@ -154,11 +154,112 @@ def test_check_four_of_a_kind():
     deck.shuffle()
     deck1=deck.deal(1,players_list)
     hand=Hand(deck1,players_list)
-    cards=[[Card("Clubs","7"),Card("Clubs","5"),Card("Diamonds","8"),Card("Clubs","10"),Card("Hearts","5"),Card("Spades","5"),Card("Diamonds","5")]]
-    reults=[True]
+    cards=[[7,5,7,9,10,7,7],[7,6,8,9,7,7,10],[8,8,8,7,7,7,10]]
+    reults=[True,False,False]
     x=0
     
     while x<len(cards):
+        print("4---------------------------4--------------------------------4--------------------4------")
+        cards[x].sort(reverse=True)
         z=hand.four_of_a_kind(players_list[0],cards[x])
         assert reults[x]==z[0]
         x=x+1
+        print("4-----------------4-----------------------------4-------------------------4---------")
+
+def test_check_three_of_a_kind():
+    players_list=list()
+    player=Player()
+    players_list.append(player)
+    player=Player()
+    players_list.append(player)
+    deck=Deck()
+    deck.shuffle()
+    deck1=deck.deal(1,players_list)
+    hand=Hand(deck1,players_list)
+    cards=[[7,5,10,9,10,7,7],[7,6,6,6,7,7,10],[8,5,8,7,9,7,10]]
+    reults=[True,True,False]
+    return_expected=[[7,7,7],[7,7,7],None]
+    x=0
+    
+    while x<len(cards):
+        print("---------3-----------------------------3-------------------------------3---------------------")
+        cards[x].sort(reverse=True)
+        z=hand.three_of_a_kind(players_list[0],cards[x])
+        assert reults[x]==z[0]
+        assert return_expected[x]==z[1]
+        x=x+1
+        print("-------------3----------------------------3----------------------3----------------------------")
+
+def test_pair():
+    players_list=list()
+    player=Player()
+    players_list.append(player)
+    player=Player()
+    players_list.append(player)
+    deck=Deck()
+    deck.shuffle()
+    deck1=deck.deal(1,players_list)
+    hand=Hand(deck1,players_list)
+    cards=[[7,5,10,9,10,9,7],[11,8,6,6,7,7,10],[8,5,14,11,9,7,10]]
+    reults=[True,True,False]
+    return_expected=[[10,10],[7,7],None]
+    x=0
+    
+    while x<len(cards):
+        print("---------2-----------------------------2-------------------------------2---------------------")
+        cards[x].sort(reverse=True)
+        z=hand.pair(players_list[0],cards[x])
+        assert reults[x]==z[0]
+        assert return_expected[x]==z[1]
+        x=x+1
+        print("-------------2----------------------------2----------------------2----------------------------")
+
+def test_two_pair():
+    players_list=list()
+    player=Player()
+    players_list.append(player)
+    player=Player()
+    players_list.append(player)
+    deck=Deck()
+    deck.shuffle()
+    deck1=deck.deal(1,players_list)
+    hand=Hand(deck1,players_list)
+    cards=[[7,5,10,9,10,9,7],[11,8,6,6,7,7,10],[8,5,14,11,9,7,10]]
+    reults=[True,True,False]
+    return_expected=[[10,10,9,9],[7,7,6,6],None]
+    x=0
+    
+    while x<len(cards):
+        print("---------2-2----------------------------2-2------------------------------2-2--------------------")
+        cards[x].sort(reverse=True)
+        z=hand.two_pair(players_list[0],cards[x])
+        print("this is z",z)
+        assert reults[x]==z[0]
+        assert return_expected[x]==z[1]
+        x=x+1
+        print("-------------2-2---------------------------2-2---------------------2-2---------------------------")
+
+def test_full_house():
+    players_list=list()
+    player=Player()
+    players_list.append(player)
+    player=Player()
+    players_list.append(player)
+    deck=Deck()
+    deck.shuffle()
+    deck1=deck.deal(1,players_list)
+    hand=Hand(deck1,players_list)
+    cards=[[7,5,10,10,10,9,7],[11,6,6,6,7,7,7],[8,5,14,11,9,7,10]]
+    reults=[True,True,False]
+    return_expected=[[10,10,10,7,7],[7,7,7,6,6],None]
+    x=0
+    
+    while x<len(cards):
+        print("---------3-2----------------------------3-2------------------------------3-2--------------------")
+        cards[x].sort(reverse=True)
+        z=hand.full_house(players_list[0],cards[x])
+        print("this is z",z)
+        assert reults[x]==z[0]
+        assert return_expected[x]==z[1]
+        x=x+1
+        print("------------3-2---------------------------3-2---------------------3-2---------------------------")

@@ -311,13 +311,17 @@ class Hand():
         item_present=False
         count=dict()
         for c in cards:
-            if c.number not in count:
-                count[c.number]=[0,[c]]
-            count[c.number][0]=count[c.number][0]+1
-            count[c.number][1].append(c)
-            if count[c.number][0]==val:
+            if c not in count:
+                count[c]=[1,[c]]
+                #print("This is number",count[c][1],"This is count",count[c][0])
+            else:
+                count[c][0]=count[c][0]+1
+                count[c][1].append(c)
+                #print("This is number",count[c],"This is count", count[c][0])
+            print("this is count",count)
+            if count[c][0]==val:
                 item_present=True
-                return item_present,count[c.number][1]
+                return item_present,count[c][1]
         return item_present,None   
    
     def multiple_pairs_method(self,cards,val):
@@ -331,12 +335,13 @@ class Hand():
                 old_cards.append(x)
                 new_cards.remove(x)
             ret2=self.pairs_method(new_cards,2)
-            if ret2==False:
+            #print("This is ret2",ret2)
+            if ret2[0]==False:
                 return ret2
-            elif ret2==True:
-                for x in old_cards:
-                    ret2[1].append(x)
-                return ret2
+            elif ret2[0]==True:
+                for x in ret2[1]:
+                    old_cards.append(x)
+                return ret2[0],old_cards
 #-------------------------------------------------------------------------------------------------------------------
     def check_flush(self,p):       
         suit_count=dict()
@@ -344,20 +349,20 @@ class Hand():
         suit_count["Clubs"]=[0,[]]    
         suit_count["Spades"]=[0,[]]    
         suit_count["Hearts"]=[0,[]]    
-           
+        print("------------------------flush---------------------------------------------------------")   
         for x in self.community_cards:
             #print("This is x number",x.number)
             print("This is x suit",x.suit,"This is x number",x.number)
             suit_count[x.suit][0]=suit_count[x.suit][0]+1
-            suit_count[x.suit][1].append(x)
+            suit_count[x.suit][1].append(x.number_value)
 
         suit_count[p.card_one.suit][0]=suit_count[p.card_one.suit][0]+1
-        suit_count[p.card_one.suit][1].append(p.card_one)   
+        suit_count[p.card_one.suit][1].append(p.card_one.number_value)   
         print("This is card 1 suit",p.card_one.suit,"This is card 1 number",p.card_one.number)
         suit_count[p.card_two.suit][0]=suit_count[p.card_two.suit][0]+1
-        suit_count[p.card_two.suit][1].append(p.card_two) 
+        suit_count[p.card_two.suit][1].append(p.card_two.number_value) 
         print("This is card 2 suit",p.card_one.suit,"This is card 2 number",p.card_one.number)
-        print("gibs")
+        print("--------flush-----------------------------flush--------------------------------------")
         if suit_count["Clubs"][0]>=5:
             #print("This is suit_count lenght",len(suit_count["Clubs"][1]))
             return True,suit_count["Clubs"][1]
@@ -371,17 +376,17 @@ class Hand():
         elif suit_count["Spades"][0]>=5:
             return True,suit_count["Spades"][1]
         else:
-            return True,None
+            return False,None
     
     def check_straight(self,p,cards):
         f=list()
         for item in cards:
-            if item.number=="Ace":
-                New_ace=Card(item.suit,"Ace")
-                New_ace.number_value=1
-                f.append(New_ace.number_value)
+            #print(cards)
+            if item==14:
+                New_ace=1
+                f.append(New_ace)
 
-            f.append(item.number_value)
+            f.append(item)
         f.sort()
          
         #print("This is f lenght",len(f))
@@ -591,11 +596,15 @@ class Hand():
     def check_straight_flush(self,p):  
         val=self.check_flush(p)
         if val[0]==False:
-            return False
+            return False,None
         elif val[0]==True:
+            print("---------------straight--------------------------------straight---------")
+            print("This is card object list",val[1])
+            k=list()
             bol=self.check_straight(p,val[1])
             print("THIS IS BOL",bol[1])
-       return bol
+            print("-------------------straight-----------------straight-------------------")
+        return bol
 
 
                 #return "STRAIGHT_FLUSH"
@@ -613,10 +622,12 @@ class Hand():
         return ret
 
     def two_pair(self,p,cards):
-        self.multiple_pairs_method(cards,2)
+        ret=self.multiple_pairs_method(cards,2)
+        return ret
     
     def full_house(self,p,cards):
-        self.multiple_pairs_method(cards,3)
+        ret=self.multiple_pairs_method(cards,3)
+        return ret
     
     def high_card(self,p,cards):
         the_cards=list()
@@ -627,12 +638,14 @@ class Hand():
 
     def check_winner(self,players_list):
         for p in players_list:
-            list_cards=self.community_cards
-            list_cards.append(p.card_one)
-            list_cards.append(p.card_two)
-            #for c in list_cards:
-               #list_card.sort(c.number_value)
-            #sorted_list_card.sort(reverse==True)
+            list_cards=list()
+            cards=self.community_cards
+            cards.append(p.card_one)
+            cards.append(p.card_two)
+            for c in cards:
+                list_cards.append(c.number_value)
+            list_cards.sort(reverse=True)
+
             val=self.check_straight_flush(p)
             if val[0]==True:
                return "STRAIGHT_FLUSH"
