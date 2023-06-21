@@ -12,6 +12,6 @@ class Card():
         elif self.number=="King":
             self.number_value=13
         elif self.number=="Ace":
-            self.number_value=1  
+            self.number_value=14  
         else:
             self.number_value=int(self.number)

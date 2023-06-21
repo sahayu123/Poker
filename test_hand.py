@@ -95,6 +95,7 @@ def test_check_function():
         j=j+1
        
 def test_check_straight_flush():
+
     players_list=list()
     player=Player()
     players_list.append(player)
@@ -140,5 +141,24 @@ def test_check_straight_flush():
     
         j=hand.check_straight_flush(players_list[0])
         print("this is test",x)
-        assert j==results[x]
+        assert j[0]==results[x]
+        x=x+1
+
+def test_check_four_of_a_kind():
+    players_list=list()
+    player=Player()
+    players_list.append(player)
+    player=Player()
+    players_list.append(player)
+    deck=Deck()
+    deck.shuffle()
+    deck1=deck.deal(1,players_list)
+    hand=Hand(deck1,players_list)
+    cards=[[Card("Clubs","7"),Card("Clubs","5"),Card("Diamonds","8"),Card("Clubs","10"),Card("Hearts","5"),Card("Spades","5"),Card("Diamonds","5")]]
+    reults=[True]
+    x=0
+    
+    while x<len(cards):
+        z=hand.four_of_a_kind(players_list[0],cards[x])
+        assert reults[x]==z[0]
         x=x+1
