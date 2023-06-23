@@ -3,7 +3,9 @@ from hand import Hand
 from player import Player
 from deck import Deck
 from cards import Card
-
+def intialize_funtcion():
+    pass
+    
 def test_input_function():
     hand_pot_values=[8,0,10,5]
     hand_previous_bet_values=[2,0,2,3]
@@ -111,6 +113,7 @@ def test_check_straight_flush():
                      Card("Clubs","Jack"),
                      Card("Clubs","2"),
                      Card("Clubs","8"),
+                     Card("Clubs","Ace"),
                      Card("Clubs","Ace")]
 
     player_two_card=[Card("Clubs","9"),
@@ -118,17 +121,18 @@ def test_check_straight_flush():
                     Card("Clubs","10"),
                     Card("Hearts","3"),
                     Card("Clubs","4"),
-                    Card("Clubs","King")]
+                    Card("Clubs","King"),
+                    Card("Clubs","Queen")]
     
     community_cards=[[Card("Clubs","7"),Card("Clubs","2"),Card("Clubs","8"),Card("Clubs","10"),Card("Clubs","5")],
                      [Card("Clubs","7"),Card("Clubs","2"),Card("Clubs","8"),Card("Clubs","Jack"),Card("Clubs","5")],
                     [Card("Hearts","7"),Card("Spades","2"),Card("Clubs","8"),Card("Clubs","Queen"),Card("Clubs","9")],
                     [Card("Hearts","7"),Card("Spades","2"),Card("Clubs","8"),Card("Clubs","Queen"),Card("Clubs","9")],
                     [Card("Hearts","7"),Card("Spades","2"),Card("Clubs","8"),Card("Clubs","Queen"),Card("Clubs","9")],
-                    [Card("Hearts","7"),Card("Spades","2"),Card("Clubs","Jack"),Card("Clubs","Queen"),Card("Clubs","10")]
- ]
+                    [Card("Hearts","7"),Card("Spades","2"),Card("Clubs","Jack"),Card("Clubs","Queen"),Card("Clubs","10")],
+                    [Card("Clubs","7"),Card("Clubs","2"),Card("Clubs","3"),Card("Clubs","4"),Card("Clubs","5")]]                  
  
-    results=[True,True,True,False,False,True]
+    results=[True,True,True,False,False,True,True]
     x=0
     while x<len(player_two_card):
         players_list[0].card_one=player_one_card[x]
@@ -156,6 +160,7 @@ def test_check_four_of_a_kind():
     hand=Hand(deck1,players_list)
     cards=[[7,5,7,9,10,7,7],[7,6,8,9,7,7,10],[8,8,8,7,7,7,10]]
     reults=[True,False,False]
+    ret_value=[0.07,None,None]
     x=0
     
     while x<len(cards):
@@ -163,6 +168,7 @@ def test_check_four_of_a_kind():
         cards[x].sort(reverse=True)
         z=hand.four_of_a_kind(players_list[0],cards[x])
         assert reults[x]==z[0]
+        assert ret_value[x]==z[1]
         x=x+1
         print("4-----------------4-----------------------------4-------------------------4---------")
 
@@ -178,7 +184,7 @@ def test_check_three_of_a_kind():
     hand=Hand(deck1,players_list)
     cards=[[7,5,10,9,10,7,7],[7,6,6,6,7,7,10],[8,5,8,7,9,7,10]]
     reults=[True,True,False]
-    return_expected=[[7,7,7],[7,7,7],None]
+    return_expected=[0.07,0.07,None]
     x=0
     
     while x<len(cards):
@@ -202,7 +208,7 @@ def test_pair():
     hand=Hand(deck1,players_list)
     cards=[[7,5,10,9,10,9,7],[11,8,6,6,7,7,10],[8,5,14,11,9,7,10]]
     reults=[True,True,False]
-    return_expected=[[10,10],[7,7],None]
+    return_expected=[0.1,0.07,None]
     x=0
     
     while x<len(cards):
@@ -226,7 +232,7 @@ def test_two_pair():
     hand=Hand(deck1,players_list)
     cards=[[7,5,10,9,10,9,7],[11,8,6,6,7,7,10],[8,5,14,11,9,7,10]]
     reults=[True,True,False]
-    return_expected=[[10,10,9,9],[7,7,6,6],None]
+    return_expected=[0.1009,0.0706,None]
     x=0
     
     while x<len(cards):
@@ -240,6 +246,7 @@ def test_two_pair():
         print("-------------2-2---------------------------2-2---------------------2-2---------------------------")
 
 def test_full_house():
+
     players_list=list()
     player=Player()
     players_list.append(player)
@@ -251,7 +258,7 @@ def test_full_house():
     hand=Hand(deck1,players_list)
     cards=[[7,5,10,10,10,9,7],[11,6,6,6,7,7,7],[8,5,14,11,9,7,10]]
     reults=[True,True,False]
-    return_expected=[[10,10,10,7,7],[7,7,7,6,6],None]
+    return_expected=[0.1007,0.0706,None]
     x=0
     
     while x<len(cards):
@@ -263,3 +270,53 @@ def test_full_house():
         assert return_expected[x]==z[1]
         x=x+1
         print("------------3-2---------------------------3-2---------------------3-2---------------------------")
+
+def test_high_card():
+    players_list=list()
+    player=Player()
+    players_list.append(player)
+    player=Player()
+    players_list.append(player)
+    deck=Deck()
+    deck.shuffle()
+    deck1=deck.deal(1,players_list)
+    hand=Hand(deck1,players_list)
+
+
+    cards=[[7,5,14,3,2,9,8]]
+    return_expected=[1.409080705,]
+    x=0
+    
+    while x<len(cards):
+        print("---------highcard----------------------------highcard-----------------------------highcard--------------------")
+        cards[x].sort(reverse=True)
+        z=hand.high_card(players_list[0],cards[0])
+        print("this is z",z)
+        assert return_expected[x]==z
+        x=x+1
+        print("------------highcard---------------------------highcard---------------------highcard---------------------------")
+
+def est_straight():
+    players_list=list()
+    player=Player()
+    players_list.append(player)
+    player=Player()
+    players_list.append(player)
+    deck=Deck()
+    deck.shuffle()
+    deck1=deck.deal(1,players_list)
+    hand=Hand(deck1,players_list)
+    cards=[[7,5,10,9,10,9,7],[11,8,6,6,7,7,10],[8,5,14,11,9,7,10]]
+    reults=[True,True,False]
+    return_expected=[0.1,0.07,None]
+    x=0
+    
+    while x<len(cards):
+        print("---------straight-----------------------------straight-------------------------------straight---------------------")
+        cards[x].sort(reverse=True)
+        z=hand.pair(players_list[0],cards[x])
+        assert reults[x]==z[0]
+        assert return_expected[x]==z[1]
+        x=x+1
+        print("-------------straight----------------------------straight----------------------straight----------------------------")
+
