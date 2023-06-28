@@ -160,7 +160,7 @@ def test_check_four_of_a_kind():
     hand=Hand(deck1,players_list)
     cards=[[7,5,7,9,10,7,7],[7,6,8,9,7,7,10],[8,8,8,7,7,7,10]]
     reults=[True,False,False]
-    ret_value=[0.07,None,None]
+    ret_value=[0.0707070710,None,None]
     x=0
     
     while x<len(cards):
@@ -182,9 +182,9 @@ def test_check_three_of_a_kind():
     deck.shuffle()
     deck1=deck.deal(1,players_list)
     hand=Hand(deck1,players_list)
-    cards=[[7,5,10,9,10,7,7],[7,6,6,6,7,7,10],[8,5,8,7,9,7,10]]
+    cards=[[7,5,10,9,8,7,7],[7,5,6,14,7,7,10],[8,5,8,7,9,7,10]]
     reults=[True,True,False]
-    return_expected=[0.07,0.07,None]
+    return_expected=[0.0707071009,0.0707071410,None]
     x=0
     
     while x<len(cards):
@@ -206,9 +206,9 @@ def test_pair():
     deck.shuffle()
     deck1=deck.deal(1,players_list)
     hand=Hand(deck1,players_list)
-    cards=[[7,5,10,9,10,9,7],[11,8,6,6,7,7,10],[8,5,14,11,9,7,10]]
+    cards=[[7,5,10,9,10,8,6],[11,8,6,6,7,7,10],[8,5,14,11,9,7,10]]
     reults=[True,True,False]
-    return_expected=[0.1,0.07,None]
+    return_expected=[0.1010090807,0.0707111008,None]
     x=0
     
     while x<len(cards):
@@ -232,7 +232,7 @@ def test_two_pair():
     hand=Hand(deck1,players_list)
     cards=[[7,5,10,9,10,9,7],[11,8,6,6,7,7,10],[8,5,14,11,9,7,10]]
     reults=[True,True,False]
-    return_expected=[0.1009,0.0706,None]
+    return_expected=[0.1010090907,0.0707060611,None]
     x=0
     
     while x<len(cards):
@@ -258,7 +258,7 @@ def test_full_house():
     hand=Hand(deck1,players_list)
     cards=[[7,5,10,10,10,9,7],[11,6,6,6,7,7,7],[8,5,14,11,9,7,10]]
     reults=[True,True,False]
-    return_expected=[0.1007,0.0706,None]
+    return_expected=[0.1010100707,0.0707070606,None]
     x=0
     
     while x<len(cards):
@@ -319,4 +319,47 @@ def est_straight():
         assert return_expected[x]==z[1]
         x=x+1
         print("-------------straight----------------------------straight----------------------straight----------------------------")
+
+def test_player_grade():
+    players_list=list()
+    player_one_bets=[14,18,100,70,70]
+    player_two_bets=[14,18,100,100,100]
+    start_amount_one=[100,100,100,70,70]
+    start_amount_two=[100,100,100,130,130]
+    player_one_round_status=["Call","Call","ALL_IN","ALL_IN","ALL_IN"]
+    player_two_round_status=["Call","Call","ALL_IN","CALL","ALL_IN"]
+    p=Player()
+    players_list.append(p)
+    p2=Player()
+    players_list.append(p2)
+    deck=Deck()
+    deck.shuffle()
+    deck1=deck.deal(1,players_list)
+    hand=Hand(deck1,players_list)
+    hand=Hand(deck1,players_list)
+    w=0
+    point_list=[[[3.1405060704,p],[3.1009080705,p2]],[[3.1009080705,p],[3.1009080705,p2]],[[3.1405060704,p],[3.1009080705,p2]],
+    [[3.1405060704,p],[3.1009080705,p2]],[[3.1009080705,p],[3.1009080705,p2]]]
+
+    val=[114,[100,100],200,60,130]
+
+    while w<len(point_list):
+        
+        p.round_status=player_one_round_status[w]
+        p.player_bet=player_one_bets[w]
+        p.money=start_amount_one[w]-player_one_bets[w]
+        print("this is p1.money",p.money)
+
+        p2.round_status=player_two_round_status[w]
+        p2.player_bet=player_two_bets[w]
+        p2.money=start_amount_two[w]-player_two_bets[w]
+        print("This is p2.money",p2.money)
+        
+        hand.hand_pot=player_one_bets[w]+player_two_bets[w]
+        
+        j=hand.player_grade(point_list[w])
+        print(j)
+        assert j==val[w]
+        w=w+1
+
 
