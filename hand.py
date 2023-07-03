@@ -83,14 +83,12 @@ class Hand():
             self.decision1=""
         if self.hand_pot >0:
             self.decision2="Raise"
-            self.decision5=" All-In"
         else:
             self.decision2=""
         self.decision3=""
         if self.hand_pot==0:
             self.decision3="Check"
             self.decision4="Bet"
-            self.decision5= "All-In"
         else:
             self.decision3=""
             self.decision4=""
@@ -108,12 +106,24 @@ class Hand():
         returns:
         1.It returns the itenary variable.
         '''
-        players_list[z].money=players_list[z].money-(self.previous_bet-players_list[z].player_bet_hand)
-        self.hand_pot=self.hand_pot+(self.previous_bet-players_list[z].player_bet_hand)
-        self.round_pot=self.round_pot+(self.previous_bet-players_list[z].player_bet_hand)
-        players_list[z].player_bet=players_list[z].player_bet+(self.previous_bet-players_list[z].player_bet_hand)
-        players_list[z].player_bet_hand=players_list[z].player_bet_hand+(self.previous_bet-players_list[z].player_bet_hand)
-        print(players_list[z].player_bet_hand)
+        
+        if int(self.previous_bet-players_list[z].player_bet_hand) >= players_list[z].money:
+            players_list[z].round_status="All_In"
+            self.hand_pot=self.hand_pot+players_list[z].money
+            self.round_pot=self.round_pot+players_list[z].money
+            players_list[z].players_bet=players_list[z].player_bet+players_list[z].money
+            players_list[z].players_bet_hand=players_list[z].player_bet_hand+players_list[z].money
+            players_list[z].money=0
+        
+        else:
+            players_list[z].money=players_list[z].money-(self.previous_bet-players_list[z].player_bet_hand)
+            self.hand_pot=self.hand_pot+(self.previous_bet-players_list[z].player_bet_hand)
+            self.round_pot=self.round_pot+(self.previous_bet-players_list[z].player_bet_hand)
+            players_list[z].player_bet=players_list[z].player_bet+(self.previous_bet-players_list[z].player_bet_hand)
+            players_list[z].player_bet_hand=players_list[z].player_bet_hand+(self.previous_bet-players_list[z].player_bet_hand)
+        
+           
+        print("This is player bet hand",players_list[z].player_bet_hand)
         print("Player",z+1, "has called and has amount",players_list[z].money)
         print("Current pot is",self.round_pot)
         print("this is player bet hand",players_list[z].player_bet_hand)
@@ -154,6 +164,10 @@ class Hand():
         self.hand_pot = self.hand_pot + (self.previous_bet - players_list[z].player_bet_hand) + int(raise_amount)
         self.round_pot = self.round_pot + self.previous_bet
         players_list[z].money = players_list[z].money - self.previous_bet
+
+        if plaeyrs_list[z].money==0:
+            players_list[z].round_status="All_In"
+
         players_list[z].player_bet_hand = players_list[z].player_bet_hand + self.previous_bet
         self.previous_bet = self.previous_bet +int(raise_amount)
 
@@ -195,6 +209,10 @@ class Hand():
             self.round_pot=self.round_pot+int(bet_amount)
 
             players_list[z].money=players_list[z].money-int(bet_amount)
+
+            if plaeyrs_list[z].money==0:
+                players_list[z].round_status="All_In"
+
             print("Player",z+1,"has bet amount",bet_amount)
             print("Current pot is",self.round_pot)
             z=(z+1)%len(players_list)
@@ -237,7 +255,7 @@ class Hand():
             elif v.round_status==None:
                 check="NO"
                 break  
-            elif v.round_status=="ALL_IN":
+            elif v.round_status=="All-In":
                 continue
             jst.append(v.player_bet_hand)
             mk.append(v)
@@ -277,7 +295,7 @@ class Hand():
                 #print("This is fold z",z)
                 z=(z+1)%len(players_list)
                 continue
-            elif players_list[z].round_status=="ALL_IN":
+            elif players_list[z].round_status=="All_In":
                 z=(z+1)%len(players_list)
                 continue
             self.imput_options(players_list,z)
@@ -559,29 +577,22 @@ class Hand():
 #----------------------------------------------------------------------------------------------------------------
     def player_grade(self,info,test=False):
         new_list=sorted(info,key=itemgetter(0),reverse=True)
-        max_score=[-1,None]
-        tier_list=list()
-        ties=list()
+        count=dict()
+        for j in new_list:
+            if j[0] not in count:
+                count[j[0]]=[1,[j[1]]]
+            else:
+                count[j[0]][0]=count[j[0]][0]+1
+                count[j[0]][1].append(j[1])
+        
         max_score_list=info.copy()
         for p in new_list:
-            ties=list()
-            for k in max_score_list:
-                print("This is k",k)
-                if k[0]==max_score[0]:
-                    ties.append(k)
-
-                elif k[0]>max_score[0]:
-                    max_score=k
-                    ties=list()
-                    ties.append(k)
-                print("This is max-score",max_score[0])
-            print("This is ties",ties)
-            print("this is p round status",p[1].round_status)
-            if p[1].round_status=="ALL_IN":
+            if p[1].round_status=="All-In":
                 player_all_in=True
             else:
                 player_all_in=False
-            if len(ties)>1:
+            print("This is count[p][0]",count[p[0]][0])
+            if count[p[0]][0]>1:
                 player_tied=True
             else:
                 player_tied=False
@@ -591,40 +602,54 @@ class Hand():
                 p[1].money=p[1].money+self.hand_pot
                 print("This is self.hand_pot",self.hand_pot)
                 self.hand_pot=0
-                
+
                 return p[1].money
                 break
             elif player_all_in==True and player_tied==False:
+                
                 print("This is pre hand.pot",self.hand_pot)
-                self.hand_pot=self.hand_pot-(p[1].player_bet*len(max_score_list))
-                p[1].money=p[1].money+(p[1].player_bet*len(max_score_list))
-                print("This is p money",p[1].money)
-                print("This is hand.pot",self.hand_pot)
+                val=self.hand_pot-(p[1].player_bet*len(max_score_list))
+                if val<0:
+                    p[1].money=p[1].money+self.hand_pot
+                    self.hand_pot=0
+                else:
+                    self.hand_pot=val
+                    p[1].money=p[1].money+(p[1].player_bet*len(max_score_list))
+                    print("This is p money",p[1].money)
+                    print("This is hand.pot",self.hand_pot)
+                max_score_list.remove(p)
+
                 if self.hand_pot==0:
+                    for x in max_score_list:
+                        if x[1].player_bet>p[1].player_bet:
+                            x[1].money=x[1].money+(x[1].player_bet-p[1].player_bet)
                     return p[1].money
                     break
                 else:
-                    max_score_list.remove(p)
+                    
                     continue
+                    
             elif player_all_in==False and player_tied==True:
                 rt_vals=list()
-                print("This is len(ties)",len(ties))
-                for j in ties:
-                    print("this is pre j[1] money",j[1].money)
-                    j[1].money=j[1].money+self.hand_pot/len(ties)
+                print("This is len(ties)",count[p[0]][0])
+                for j in count[p[0]][1]:
+                    print("this is pre j[1] money",j.money)
+                    j.money=j.money+self.hand_pot/count[p[0]][0]
                     print("This is hand pot",self.hand_pot)
-                    print("This is j[1].money",j[1].money)
-                    rt_vals.append(j[1].money)
+                    print("This is j[1].money",j.money)
+                    rt_vals.append(j.money)
                 self.hand_pot=0
                 print("thIS IS RT_VALS",rt_vals)
                 return rt_vals
                 break
             elif player_all_in==True and player_tied==True:
-                print("this is formula",p[1].player_bet*len(new_list)/len(ties))
+                print("this is formula",p[1].player_bet*len(max_score_list)/count[p[0]][0])
                 print("this is p[1].money pre",p[1].money)
-                p[1].money=p[1].money+(p[1].player_bet*len(new_list))/len(ties)
+                p[1].money=p[1].money+(p[1].player_bet*len(max_score_list))/count[p[0]][0]
                 print("this is p[1].money",p[1].money)
-                self.hand_pot=self.hand_pot-(p[1].player_bet*len(new_list))/len(ties)
+                self.hand_pot=self.hand_pot-(p[1].player_bet*len(max_score_list))/count[p[0]][0]
+                count[p[0]][0]=count[p[0]][0]-1
+                count[p[0]][1]=count[p[0]][1].remove(p[1])
                 max_score_list.remove(p)
                 print("this is max_score_list",max_score_list)
                 continue
