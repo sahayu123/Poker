@@ -3,8 +3,6 @@ from hand import Hand
 from player import Player
 from deck import Deck
 from cards import Card
-def intialize_funtcion():
-    pass
     
 def test_input_function():
     hand_pot_values=[8,0,10,5]
@@ -95,9 +93,8 @@ def test_check_function():
         cont_value=hand.round_check(players_list)
         assert cont_value==cont_values[j]
         j=j+1
-       
-def test_check_straight_flush():
 
+def initiazlize_function():
     players_list=list()
     player=Player()
     players_list.append(player)
@@ -107,14 +104,21 @@ def test_check_straight_flush():
     deck.shuffle()
     deck1=deck.deal(1,players_list)
     hand=Hand(deck1,players_list)
+    return hand,players_list
+
+def test_check_straight_flush():
+
+    c=initiazlize_function()
+    hand=c[0]
+    players_list=c[1]
     
     player_one_card=[Card("Clubs","6"),
-                     Card("Clubs","9"),
-                     Card("Clubs","Jack"),
-                     Card("Clubs","2"),
-                     Card("Clubs","8"),
-                     Card("Clubs","Ace"),
-                     Card("Clubs","Ace")]
+                    Card("Clubs","9"),
+                    Card("Clubs","Jack"),
+                    Card("Clubs","2"),
+                    Card("Clubs","8"),
+                    Card("Clubs","Ace"),
+                    Card("Clubs","Ace")]
 
     player_two_card=[Card("Clubs","9"),
                     Card("Clubs","10"),
@@ -138,7 +142,6 @@ def test_check_straight_flush():
         players_list[0].card_one=player_one_card[x]
         players_list[0].card_two=player_two_card[x]
    
-        hand=Hand(players_list,deck1)
         hand.community_cards=community_cards[x]
         print("This is community cards",hand.community_cards)
     
@@ -149,15 +152,9 @@ def test_check_straight_flush():
         x=x+1
 
 def test_check_four_of_a_kind():
-    players_list=list()
-    player=Player()
-    players_list.append(player)
-    player=Player()
-    players_list.append(player)
-    deck=Deck()
-    deck.shuffle()
-    deck1=deck.deal(1,players_list)
-    hand=Hand(deck1,players_list)
+    c=initiazlize_function()
+    hand=c[0]
+    players_list=c[1]
     cards=[[7,5,7,9,10,7,7],[7,6,8,9,7,7,10],[8,8,8,7,7,7,10]]
     reults=[True,False,False]
     ret_value=[0.0707070710,None,None]
@@ -173,15 +170,9 @@ def test_check_four_of_a_kind():
         print("4-----------------4-----------------------------4-------------------------4---------")
 
 def test_check_three_of_a_kind():
-    players_list=list()
-    player=Player()
-    players_list.append(player)
-    player=Player()
-    players_list.append(player)
-    deck=Deck()
-    deck.shuffle()
-    deck1=deck.deal(1,players_list)
-    hand=Hand(deck1,players_list)
+    c=initiazlize_function()
+    hand=c[0]
+    players_list=c[1]
     cards=[[7,5,10,9,8,7,7],[7,5,6,14,7,7,10],[8,5,8,7,9,7,10]]
     reults=[True,True,False]
     return_expected=[0.0707071009,0.0707071410,None]
@@ -197,15 +188,10 @@ def test_check_three_of_a_kind():
         print("-------------3----------------------------3----------------------3----------------------------")
 
 def test_pair():
-    players_list=list()
-    player=Player()
-    players_list.append(player)
-    player=Player()
-    players_list.append(player)
-    deck=Deck()
-    deck.shuffle()
-    deck1=deck.deal(1,players_list)
-    hand=Hand(deck1,players_list)
+    c=initiazlize_function()
+    hand=c[0]
+    players_list=c[1]
+
     cards=[[7,5,10,9,10,8,6],[11,8,6,6,7,7,10],[8,5,14,11,9,7,10]]
     reults=[True,True,False]
     return_expected=[0.1010090807,0.0707111008,None]
@@ -221,15 +207,10 @@ def test_pair():
         print("-------------2----------------------------2----------------------2----------------------------")
 
 def test_two_pair():
-    players_list=list()
-    player=Player()
-    players_list.append(player)
-    player=Player()
-    players_list.append(player)
-    deck=Deck()
-    deck.shuffle()
-    deck1=deck.deal(1,players_list)
-    hand=Hand(deck1,players_list)
+    c=initiazlize_function()
+    hand=c[0]
+    players_list=c[1]
+
     cards=[[7,5,10,9,10,9,7],[11,8,6,6,7,7,10],[8,5,14,11,9,7,10]]
     reults=[True,True,False]
     return_expected=[0.1010090907,0.0707060611,None]
@@ -247,15 +228,10 @@ def test_two_pair():
 
 def test_full_house():
 
-    players_list=list()
-    player=Player()
-    players_list.append(player)
-    player=Player()
-    players_list.append(player)
-    deck=Deck()
-    deck.shuffle()
-    deck1=deck.deal(1,players_list)
-    hand=Hand(deck1,players_list)
+    c=initiazlize_function()
+    hand=c[0]
+    players_list=c[1]
+
     cards=[[7,5,10,10,10,9,7],[11,6,6,6,7,7,7],[8,5,14,11,9,7,10]]
     reults=[True,True,False]
     return_expected=[0.1010100707,0.0707070606,None]
@@ -272,15 +248,10 @@ def test_full_house():
         print("------------3-2---------------------------3-2---------------------3-2---------------------------")
 
 def test_high_card():
-    players_list=list()
-    player=Player()
-    players_list.append(player)
-    player=Player()
-    players_list.append(player)
-    deck=Deck()
-    deck.shuffle()
-    deck1=deck.deal(1,players_list)
-    hand=Hand(deck1,players_list)
+
+    c=initiazlize_function()
+    hand=c[0]
+    players_list=c[1]
 
 
     cards=[[7,5,14,3,2,9,8]]
@@ -296,25 +267,20 @@ def test_high_card():
         x=x+1
         print("------------highcard---------------------------highcard---------------------highcard---------------------------")
 
-def est_straight():
-    players_list=list()
-    player=Player()
-    players_list.append(player)
-    player=Player()
-    players_list.append(player)
-    deck=Deck()
-    deck.shuffle()
-    deck1=deck.deal(1,players_list)
-    hand=Hand(deck1,players_list)
-    cards=[[7,5,10,9,10,9,7],[11,8,6,6,7,7,10],[8,5,14,11,9,7,10]]
-    reults=[True,True,False]
-    return_expected=[0.1,0.07,None]
+def test_straight():
+    c=initiazlize_function()
+    hand=c[0]
+    players_list=c[1]
+
+    cards=[[7,5,10,8,10,9,6],[11,8,6,6,7,7,10],[8,5,14,11,9,7,10],[14,2,3,4,5,11]]
+    reults=[True,False,True,True]
+    return_expected=[0.1009080706,None,0.1110090807,0.0504030201]
     x=0
     
     while x<len(cards):
         print("---------straight-----------------------------straight-------------------------------straight---------------------")
         cards[x].sort(reverse=True)
-        z=hand.pair(players_list[0],cards[x])
+        z=hand.check_straight(players_list[0],cards[x])
         assert reults[x]==z[0]
         assert return_expected[x]==z[1]
         x=x+1
@@ -337,29 +303,33 @@ def test_player_grade():
     player_two_bets=[14,18,100,100,100,70,100]
     start_amount_one=[100,100,100,70,70,60,110]
     start_amount_two=[100,100,100,130,130,70,100]
-    val=[114,[100,100],200,60,130,130,100]
+    val=[[114],[100,100],[200],[140,60],[70,130],[130],[110,100]]
     player_one_round_status=["Call","Call","All-In","All-In","All-In","All-In","All-In"]
-    player_two_round_status=["Call","Call","All-In","CALL","All-In","All-In","All-In"]
+    player_two_round_status=["Call","Call","All-In","Call","Call","All-In","All-In"]
     point_list=[[[3.1405060704,p],[3.1009080705,p2]],[[3.1009080705,p],[3.1009080705,p2]],[[3.1405060704,p],[3.1009080705,p2]],
     [[3.1405060704,p],[3.1009080705,p2]],[[3.1009080705,p],[3.1009080705,p2]],[[3.1009080705,p],[3.1009080706,p2]],[[3.1009080705,p],[3.1009080705,p2]]]
 
     
 
     while w<len(point_list):
-        
+        print("-----------------------------------------------------------------------------------------------------------------------")
         p.round_status=player_one_round_status[w]
         p.player_bet=player_one_bets[w]
         p.money=start_amount_one[w]-player_one_bets[w]
+        p.point_val=point_list[w][0][0]
         print("this is p1.money",p.money)
 
         p2.round_status=player_two_round_status[w]
         p2.player_bet=player_two_bets[w]
         p2.money=start_amount_two[w]-player_two_bets[w]
+        p2.point_val=point_list[w][1][0]
         print("This is p2.money",p2.money)
         
         hand.hand_pot=player_one_bets[w]+player_two_bets[w]
+        print("This is hand.hand_pot",hand.hand_pot)
+        
         print(point_list[w])
-        j=hand.player_grade(point_list[w])
+        j=hand.player_grade(point_list[w],True)
         print(j)
         assert j==val[w]
         w=w+1

@@ -9,6 +9,7 @@ class Player:
         self.round_status=None
         self.player_bet=0
         self.player_bet_hand=0
+        self.point_val=0
         #self.name=input("please enter name:")
         names=["b","c","d","e","f"]
         self.name=names[0]

@@ -1,6 +1,7 @@
 import random
 from cards import Card
 from operator import itemgetter
+
 class Hand():
     def __init__(self,player_list,deck):
         '''The init method of the hand class intitializes the attrbitutes of the hand.
@@ -17,6 +18,7 @@ class Hand():
         self.players_in_game=self.players_list
         self.round_pot=0
         self.hand_pot=0
+       
         
     def community_cards_deal(self,amount_cards,players_list):
         '''The community_cards_deal method of the hand class deals cards to the community cards attribute.
@@ -95,7 +97,7 @@ class Hand():
         if players_list[z].player_bet_hand==self.previous_bet and players_list[z].round_status==None:
             self.decision3="Check"
         if test=="NO":
-            players_list[z].round_status=input(f"Do you want to Fold {self.decision1} {self.decision2} {self.decision3} {self.decision4} {self.decision5} :")
+            players_list[z].round_status=input(f"Do you want to Fold {self.decision1} {self.decision2} {self.decision3} {self.decision4}  :")
          
     def call(self,players_list,z):
         '''
@@ -125,7 +127,7 @@ class Hand():
            
         print("This is player bet hand",players_list[z].player_bet_hand)
         print("Player",z+1, "has called and has amount",players_list[z].money)
-        print("Current pot is",self.round_pot)
+        print("Current pot is",self.hand_pot)
         print("this is player bet hand",players_list[z].player_bet_hand)
         z=(z+1)%len(players_list)
         print("This is Z",z)
@@ -161,19 +163,20 @@ class Hand():
                 print(players_list[z].player_bet)
                 continue
             break
+        print("THis is player_bet_hand",players_list[z].player_bet_hand)
         self.hand_pot = self.hand_pot + (self.previous_bet - players_list[z].player_bet_hand) + int(raise_amount)
-        self.round_pot = self.round_pot + self.previous_bet
-        players_list[z].money = players_list[z].money - self.previous_bet
+        self.round_pot = self.round_pot + (self.previous_bet-players_list[z].player_bet_hand)+int(raise_amount)
+        players_list[z].money = players_list[z].money - (self.previous_bet-players_list[z].player_bet_hand)+int(raise_amount)
 
-        if plaeyrs_list[z].money==0:
+        if players_list[z].money==0:
             players_list[z].round_status="All_In"
 
-        players_list[z].player_bet_hand = players_list[z].player_bet_hand + self.previous_bet
+        players_list[z].player_bet_hand = players_list[z].player_bet_hand + (self.previous_bet-players_list[z].player_bet_hand)+int(raise_amount)
         self.previous_bet = self.previous_bet +int(raise_amount)
 
 
         print("Player", z+1, "has raised and has amount", players_list[z].money)
-        print("Current pot is", self.round_pot)
+        print("Current pot is", self.hand_pot)
         z = (z + 1) % len(players_list)  
         return z
    
@@ -205,16 +208,16 @@ class Hand():
 
             players_list[z].player_bet_hand=players_list[z].player_bet_hand+int(bet_amount)
             self.previous_bet=int(bet_amount)
-            self.hand_pot=int(bet_amount)
-            self.round_pot=self.round_pot+int(bet_amount)
+            self.round_pot=int(bet_amount)
+            self.hand_pot=self.hand+int(bet_amount)
 
             players_list[z].money=players_list[z].money-int(bet_amount)
 
-            if plaeyrs_list[z].money==0:
+            if players_list[z].money==0:
                 players_list[z].round_status="All_In"
 
             print("Player",z+1,"has bet amount",bet_amount)
-            print("Current pot is",self.round_pot)
+            print("Current pot is",self.hand)
             z=(z+1)%len(players_list)
             break
         return z
@@ -241,7 +244,7 @@ class Hand():
                     for g in players_list:
                         if g.round_status!="Fold":
                             g.round_status="Won_hand"
-                            g.money=g.money+self.round_pot
+                            g.money=g.money+self.hand_pot
                             print(g.name,"wins")
                             print(g.name,"has amount",g.money)
                             stab="NO" 
@@ -320,20 +323,17 @@ class Hand():
             elif cont=="WON":
                 return "NO_NEW_ROUND"
 #--------------------------------------------------------------------------------------------------------------   
-    def check_straight_method(self,f,x,g):
-        #print("This is x",x)
-        #print("This is f list",f)
-        while x<g:
-            if f[x]==f[x+1]-1:
-                print("Checking this ",f[x],"and this",f[x+1])
-                straight=True
-            else:
-                straight=False
-                return straight,None        
-            x=x+1
-        return straight,f
 
     def pairs_method(self,cards,val,need_high_card,x=False):
+        '''The pairs_method of the Hand class identifies if either a pair, three of a kind or a four of kind is present depending on the input
+        paramteres:
+            1.The first parameter is the list of cards
+            2.The second parameter is what kind of pair needs to be identified, either 2,3 or 4
+            3. The third parameter determins if a high cards should also be returned with the function
+            4. the fourth parameter is an optional parameter that determins how many cards should be returned
+        returns:
+            1. It returns either True or False depending if the item is present
+            2. It returns the list of cards that form the hand'''
         print("Thi si sinput cards",cards)
         item_present=False
         count=dict()
@@ -370,6 +370,14 @@ class Hand():
         return item_present,None   
    
     def multiple_pairs_method(self,cards,val):
+        '''The multiple_pairs_method of the Hand class identifies if either a two pair or a full house present depending on the input
+        paramteres:
+            1.The first parameter is the list of cards
+            2.The second parameter is what kind of pairs needs to be identified, either 2(for two pair) or 3(for full house)
+        
+        returns:
+            1. It returns either True or False depending if the item is present
+            2. It returns the list of cards that form the hand'''
         if val==3:
             need_high_card=False
         else:
@@ -397,6 +405,11 @@ class Hand():
                 return ret2[0],old_cards
        
     def calculate_decimal_points(self,cards):
+        '''The calculate_decimal_points method of the hand class turns the player's hand into a decimal number
+        parameters:
+            1.The parameter is the list of cards
+        returns:
+            1.It returns the decimal value for the player's hand'''
         new_cards=cards.copy()
         print("This is new_cards",new_cards)
         final_number=""
@@ -417,6 +430,12 @@ class Hand():
         return actual_final_number_return_value       
 #-------------------------------------------------------------------------------------------------------------------
     def check_flush(self,p):       
+        '''The check_flush method of the hand class will check if a flush is present in a Poker hand
+        parameters:
+            1.The first parameter is the player object 
+        returns:
+            1. True or False depending if the hand is present 
+            2. Either the point value of how strong the hand is or None if the hand isn't there'''
         suit_count=dict()
         suit_count["Diamonds"]=[0,[]] 
         suit_count["Clubs"]=[0,[]]    
@@ -460,6 +479,13 @@ class Hand():
             return False,None,None,None
     
     def check_straight(self,p,cards):
+        '''The check_straight method of the hand class will check if a straight is present in a Poker hand
+        parameters:
+            1.The first parameter is the player object 
+            2. The second parameter is the cards
+        returns:
+            1. True or False depending if the hand is present 
+            2. Either thr point value of how strong the hand is or None if the hand isn't there'''
         f=list()
         for item in cards:
             #print(cards)
@@ -474,6 +500,7 @@ class Hand():
         lst=list()
         lst.append(f[0])
         while x<len(f)-1:
+            print("This is f[x]",f[x],"This is f[x+1]",f[x+1])
             if f[x]==f[x+1]+1:
                 count=count+1
                 if f[x] not in lst:
@@ -501,6 +528,12 @@ class Hand():
         #print("This is f",f)
        
     def check_straight_flush(self,p):  
+        '''The check_straight_flush method of the hand class will check if a straight flush  is present in a Poker hand
+        parameters:
+            1.The first parameter is the player object 
+        returns:
+            1. True or False depending if the hand is present 
+            2. Either thr point value of how strong the hand is or None if the hand isn't there'''
         val=self.check_flush(p)
         if val[0]==False:
             return False,None
@@ -517,14 +550,28 @@ class Hand():
                 #return "STRAIGHT_FLUSH"
     
     def four_of_a_kind(self,p,cards):
-       ret=self.pairs_method(cards,4,True)
-       print("tHIS IS RET[1]",ret[1])
-       if ret[1]==None:
+        '''The four_of_a_kind method of the hand class will check if a four of a kind is present in a Poker hand
+        parameters:
+            1.The first parameter is the player object 
+            2. The second parameter is the cards
+        returns:
+            1. True or False depending if the hand is present 
+            2. Either thr point value of how strong the hand is or None if the hand isn't there'''
+        ret=self.pairs_method(cards,4,True)
+        print("tHIS IS RET[1]",ret[1])
+        if ret[1]==None:
             return False,None
-       soup=self.calculate_decimal_points(ret[1])
-       return ret[0],soup
+        soup=self.calculate_decimal_points(ret[1])
+        return ret[0],soup
 
     def three_of_a_kind(self,p,cards):
+        '''The three_of_a_kind method of the hand class will check if a three of a kind is present in a Poker hand
+        parameters:
+            1.The first parameter is the player object 
+            2. The second parameter is the cards
+        returns:
+            1. True or False depending if the hand is present 
+            2. Either thr point value of how strong the hand is or None if the hand isn't there'''
         ret=self.pairs_method(cards,3,True)
         if ret[1]==None:
             return False,None
@@ -532,6 +579,13 @@ class Hand():
         return ret[0],soup
     
     def pair(self,p,cards):
+        '''pair method of the hand class will check if a pair is present in a Poker hand
+        parameters:
+            1.The first parameter is the player object 
+            2. The second parameter is the cards
+        returns:
+            1. True or False depending if the hand is present 
+            2. Either thr point value of how strong the hand is or None if the hand isn't there'''
         ret=self.pairs_method(cards,2,True)
         if ret[1]==None:
             return False,None
@@ -539,6 +593,13 @@ class Hand():
         return ret[0],soup
 
     def two_pair(self,p,cards):
+        '''The two_pair method of the hand class will check if a two pair is present in a Poker hand
+        parameters:
+            1.The first parameter is the player object 
+            2. The second parameter is the cards
+        returns:
+            1. True or False depending if the hand is present 
+            2. Either thr point value of how strong the hand is or None if the hand isn't there'''
         ret=self.multiple_pairs_method(cards,2)
         if ret[1]==None:
             return False,None
@@ -546,6 +607,13 @@ class Hand():
         return ret[0],soup
     
     def full_house(self,p,cards):
+        '''The full_house method of the hand class will check if a full house is present in a Poker hand
+        parameters:
+            1.The first parameter is the player object 
+            2. The second parameter is the cards
+        returns:
+            1. True or False depending if the hand is present 
+            2. Either thr point value of how strong the hand is or None if the hand isn't there'''
         ret=self.multiple_pairs_method(cards,3)
         if ret[1]==None:
             return False,None
@@ -553,6 +621,12 @@ class Hand():
         return ret[0],soup
     
     def high_card(self,p,cards):
+        '''The high_card method of the hand class will calculate a point value for the high card in a Poker hand
+        parameters:
+            1.The first parameter is the player object 
+            2. The second parameter is the cards
+        returns:
+            1. returns the point value for the high card for a hand'''
         the_cards=list()
         for x in cards:
             the_cards.append(x)
@@ -576,14 +650,24 @@ class Hand():
         return actual_final_number_return_value
 #----------------------------------------------------------------------------------------------------------------
     def player_grade(self,info,test=False):
+        '''The player_grade function of the hand class identifies the winner/winners of a Poker hand based on the value of their hand and allocate the money to them accordingly
+        parameters:
+                1. A list of the value of a player's hand and the player object.
+                2. This is an optional parameter that should be made True when one is testing the function.  '''
         new_list=sorted(info,key=itemgetter(0),reverse=True)
         count=dict()
+        rts_val=list()
         for j in new_list:
+            cot=0
             if j[0] not in count:
                 count[j[0]]=[1,[j[1]]]
+                print("THis is count[j[0]]",count[j[0]])
             else:
                 count[j[0]][0]=count[j[0]][0]+1
+                print("This is count[j[0]][0]",count[j[0]][0])
                 count[j[0]][1].append(j[1])
+                
+                        
         
         max_score_list=info.copy()
         for p in new_list:
@@ -597,72 +681,214 @@ class Hand():
             else:
                 player_tied=False
             print("This is player_all_in",player_all_in)
+            print("This is player tied",player_tied)
+
+
             if player_all_in==False and player_tied==False:
                 print("this is pre self.hand_pot",self.hand_pot)
                 p[1].money=p[1].money+self.hand_pot
+                rts_val.append(p[1].money)
                 print("This is self.hand_pot",self.hand_pot)
                 self.hand_pot=0
-
-                return p[1].money
-                break
-            elif player_all_in==True and player_tied==False:
-                
-                print("This is pre hand.pot",self.hand_pot)
-                val=self.hand_pot-(p[1].player_bet*len(max_score_list))
-                if val<0:
-                    p[1].money=p[1].money+self.hand_pot
-                    self.hand_pot=0
+                if test:
+                    return rts_val
                 else:
-                    self.hand_pot=val
-                    p[1].money=p[1].money+(p[1].player_bet*len(max_score_list))
-                    print("This is p money",p[1].money)
-                    print("This is hand.pot",self.hand_pot)
+                    break
+            elif player_all_in==True and player_tied==False:
+                amount_won=0
+                i=0
                 max_score_list.remove(p)
+                for o in max_score_list:
+                    check=o[1].player_bet-p[1].player_bet
+                    if check<0:
+                        check=0
+                    i=i+check
+                    print("THis is i",i)
+                    o[1].player_bet=check
+                print("This is self.hand_pot",self.hand_pot)
+                print("This is p[1].money",p[1].money)
+                print("This is i",i)
+                p[1].money=p[1].money+self.hand_pot-i
+                rts_val.append(p[1].money)
+                self.hand_pot=i
+                if self.hand_pot==0:
+                    if test:
+                        return rts_val
+                    else:
+                        break
+                else:
+                    continue           
+               
+            elif player_all_in==False and player_tied==True:
+                l=0
+                for x in count[p[0]][1]:
+                    if x==p[1]:
+                        continue
+                    l=l+x.player_bet-p[1].player_bet
+                    if l<0:
+                        l=0
+                    print("This is l",l)
+                
+                print("This is len(ties)",count[p[0]][0])
+                val=(self.hand_pot-l)/count[p[0]][0]
+                print("This is val",val)
+                p[1].money=p[1].money+val
+                print("This is hand pot",self.hand_pot)
+                self.hand_pot=self.hand_pot-val
+                print("This is count",count[p[0]][1])
+                print("This is p[1]",p[1])
+                rts_val.append(p[1].money)
+                count[p[0]][1].remove(p[1])
+                count[p[0]][0]=count[p[0]][0]-1
+                max_score_list.remove(p)
+                if self.hand_pot==0:
+                    if test:
+                        return rts_val
+                    else:
+                        break
+                else:
+                    continue
+                
+                   
+               
+                
+            elif player_tied==True and player_all_in==True:
+                val= a = tied_bets = cnt = cnt2 = new_amount  = 0
+                amount_division=dict()
+                items=list()
+                
+                print("This is p[1].money",p[1].money)
+                max_score_list.remove(p)
+                amount=self.hand_pot-p[1].player_bet
+                p[1].money=p[1].money+p[1].player_bet
+                fold_amount=self.hand_pot-p[1].player_bet
+                self.hand_pot=self.hand_pot-p[1].player_bet
+                for x in max_score_list:
+                    if x[1] in count[p[0]][1]:
+                        fold_amount=fold_amount-x[1].player_bet
+                        continue
+                    val = x[1].player_bet-p[1].player_bet
+                    fold_amount=fold_amount-x[1].player_bet
+                    if val < 0:
+                        val=0
+                    amount = amount - val
+                    a=a+val
+                amount=amount-fold_amount
+                print("This is count[p[0]][1]",count[p[0]][1])
+                for y in count[p[0]][1]:
+                    print("This is y.player_bet",y.player_bet,"This is p[1].player_bet",p[1].player_bet)
+                    if p[1].player_bet>y.player_bet:
+                        print("This thing",p[1].player_bet-y.player_bet)
+                        print("Amount",amount)
+                        cnt2=amount-(p[1].player_bet-y.player_bet)
+                        print("This is cnt2",cnt2)
+                        if cnt2<0:
+                            cnt2=0
+                        if cnt2 not in amount_division:
+                            amount_division[cnt2]=2
+                            items.append(cnt2)
+                        else:
+                            amount_division[cnt2]=amount_division[cnt2]+1
+
+                    amount=amount-y.player_bet   
+                    tied_bets=tied_bets+y.player_bet
+                print("Items",items)
+                for b in items:
+                    amount=amount-(b/amount_division[b])
+                    print("This is formula",(b/amount_division[b]))
+                    new_amount=new_amount+(b/amount_division[b])
+                
+                percentage=p[1].player_bet/tied_bets
+                #amount = amount + (fold_amount * percentage)
+                #print("this is new_amount formula",amount/count[p[0]][0])
+                if amount>0:
+                    new_amount=new_amount+amount/count[p[0]][0]
+                new_amount=new_amount+(fold_amount*percentage)
+                print("this is new_amount",new_amount)
+                print("This is pre self.hand_pot",self.hand_pot)
+                self.hand_pot=self.hand_pot-new_amount
+                print("This is self.hand_pot",self.hand_pot)
+                print(" pre p[1] bet=",p[1].player_bet)
+                print("This is pre p[1].money",p[1].money)
+                rts_val.append(p[1].money)
+                count[p[0]][1].remove(p[1])
+                count[p[0]][0]=count[p[0]][0]-1
 
                 if self.hand_pot==0:
-                    for x in max_score_list:
-                        if x[1].player_bet>p[1].player_bet:
-                            x[1].money=x[1].money+(x[1].player_bet-p[1].player_bet)
-                    return p[1].money
-                    break
+                    if test:
+                        return rts.val
+                    else:
+                        break
                 else:
+                    print("In continue and p[1] bet=",p[1].player_bet)
+                    print("This is p[1].money",p[1].money)
                     
                     continue
-                    
-            elif player_all_in==False and player_tied==True:
-                rt_vals=list()
-                print("This is len(ties)",count[p[0]][0])
-                for j in count[p[0]][1]:
-                    print("this is pre j[1] money",j.money)
-                    j.money=j.money+self.hand_pot/count[p[0]][0]
-                    print("This is hand pot",self.hand_pot)
-                    print("This is j[1].money",j.money)
-                    rt_vals.append(j.money)
-                self.hand_pot=0
-                print("thIS IS RT_VALS",rt_vals)
-                return rt_vals
-                break
-            elif player_all_in==True and player_tied==True:
-                print("this is formula",p[1].player_bet*len(max_score_list)/count[p[0]][0])
-                print("this is p[1].money pre",p[1].money)
-                p[1].money=p[1].money+(p[1].player_bet*len(max_score_list))/count[p[0]][0]
-                print("this is p[1].money",p[1].money)
-                self.hand_pot=self.hand_pot-(p[1].player_bet*len(max_score_list))/count[p[0]][0]
-                count[p[0]][0]=count[p[0]][0]-1
-                count[p[0]][1]=count[p[0]][1].remove(p[1])
+
+                        
+                
+
+
+                
+
+    
+
+
+                
+                
+                
+                '''amount_won=0
+                i=0
+                print('This is max_score_list',max_score_list)
+                print("This is count",count[p[0]][1])
                 max_score_list.remove(p)
-                print("this is max_score_list",max_score_list)
-                continue
-        return new_list[0][1].money
+                print("This is max_score_list",max_score_list)
+                for o in max_score_list:
+                    print("This is o[1]",o[1].player_bet,"This is p[1]",p[1].player_bet)
+                    check=o[1].player_bet-p[1].player_bet/count[p[0]][0]
+                    if check<0:
+                        check=0
+                    i=i+check
+                    print("THis is i",i)
+                    o[1].player_bet=check
+                p[1].money=p[1].money+(self.hand_pot-i)/count[p[0]][0]
+                self.hand_pot=i
+                if self.hand_pot==0:
+                    if test:
+                        return p[1].money
+                    else:
+                        break
+                else:
+                    continue       
+                    '''    
 
 
 
 
 
-               
-            
 
+
+            '''
+                rt_val=list()
+                for x in count[p[0]][1]:
+                    print("THis is count[p[0]][1]",count[p[0]][1])
+                    self.hand_pot=self.hand_pot-x.player_bet
+                    x.money=x.money+x.player_bet
+                money_won_players=self.hand_pot/count[p[0]][0]
+                for i in count[p[0]][1]:
+                    i.money=i.money+money_won_players
+                    rt_val.append(i.money)
+                if test:
+                    return rt_val
+                else:
+                    break
+            '''
+  
     def check_winner(self,players_list):
+        '''The check_winner function of the hand class looks for the winner/winners of a Poker hand and allocates their money won accordingly
+            parameters:
+            1. the list of players in the game 
+            '''
         points_list=list()
         for p in players_list:
             list_cards=list()
@@ -677,6 +903,7 @@ class Hand():
             if val[0]==True:
                 point_value=9+val[1]
                 points_list.append([point_value,p])
+                p.point_val=point_value
                 continue
                 
                #return "STRAIGHT_FLUSH"
@@ -686,6 +913,7 @@ class Hand():
             if val[0]==True:
                 point_value=8+val[1]
                 points_list.append([point_value,p])
+                p.point_val=point_value
                 continue
                 #return "FOUR_OF_A_KIND"
             elif val[0]==False:
@@ -694,6 +922,7 @@ class Hand():
             if val[0]==True:
                 point_value=7+val[1]
                 points_list.append([point_value,p])
+                p.point_val=point_value
                 continue
                 #return "FULL_HOUSE"
             elif val[0]==False:
@@ -702,6 +931,7 @@ class Hand():
             if val[0]==True:
                 point_value=6+val[2]
                 points_list.append([point_value,p])
+                p.point_val=point_value
                 continue
                 #return "FLUSH"
             elif val[0]==False:
@@ -710,6 +940,7 @@ class Hand():
             if val[0]==True:
                 point_value=5+val[1]
                 points_list.append([point_value,p])
+                p.point_val=point_value
                 continue
                 #return "STRAIGHT"
             elif val[0]==False:
@@ -718,6 +949,7 @@ class Hand():
             if val[0]==True:
                 point_value=4+val[1]
                 points_list.append([point_value,p])
+                p.point_val=point_value
                 continue
                 #return "THREE_OF_A_KIND"
             elif val[0]==False:
@@ -726,6 +958,7 @@ class Hand():
             if val[0]==True:
                 point_value=3+val[1]
                 points_list.append([point_value,p])
+                p.point_val=point_value
                 continue
                 #return "TWO_PAIR"
             elif val[0]==False:
@@ -734,11 +967,13 @@ class Hand():
             if val[0]==True:
                 point_value=2+val[1]
                 points_list.append([point_value,p])
+                p.point_val=point_value
                 continue
                 #return "PAIR"
             elif val[0]==False:
                 high_card_value=self.high_card(p,cards)
                 points_list.append([high_card_value,p])
+                p.point_val=high_card_value
                 #return "HIGH_CARD"
         self.player_grade(points_list)
             
