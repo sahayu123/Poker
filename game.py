@@ -18,6 +18,7 @@ class Game():
                 player_list.remove(p)
                 print("Player",p.name,"has been removed from the game due to a lack of funds")
         return player_list
+        
 
 
     def cash_out(self,player_list):

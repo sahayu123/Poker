@@ -303,7 +303,7 @@ def test_player_grade():
     player_two_bets=[14,18,100,100,100,70,100]
     start_amount_one=[100,100,100,70,70,60,110]
     start_amount_two=[100,100,100,130,130,70,100]
-    val=[[114],[100,100],[200],[140,60],[70,130],[130],[110,100]]
+    val=[[114],[100,100],[200],[140,60],[70,130],[130],[100,110]]
     player_one_round_status=["Call","Call","All-In","All-In","All-In","All-In","All-In"]
     player_two_round_status=["Call","Call","All-In","Call","Call","All-In","All-In"]
     point_list=[[[3.1405060704,p],[3.1009080705,p2]],[[3.1009080705,p],[3.1009080705,p2]],[[3.1405060704,p],[3.1009080705,p2]],

@@ -11,7 +11,7 @@ class Player:
         self.player_bet_hand=0
         self.point_val=0
         #self.name=input("please enter name:")
-        self.name=input("Please enter name : ")
+        self.name="John"
         
         
 

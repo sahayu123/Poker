@@ -2,8 +2,9 @@ import random
 from cards import Card
 from operator import itemgetter
 
+
 class Hand():
-    def __init__(self,player_list,deck,small_blind):
+    def __init__(self,player_list,deck,small_blind=0):
         '''The init method of the hand class intitializes the attrbitutes of the hand.
         parameters:
         1. The list of players is the first parameter.
@@ -626,7 +627,7 @@ class Hand():
             return False,None
         soup=self.calculate_decimal_points(ret[1])
         return ret[0],soup
-    
+
     def high_card(self,p,cards):
         '''The high_card method of the hand class will calculate a point value for the high card in a Poker hand
         parameters:
@@ -662,12 +663,107 @@ class Hand():
                 1. A list of the value of a player's hand and the player object.
                 2. This is an optional parameter that should be made True when one is testing the function.  '''
         new_list=sorted(info,key=itemgetter(0),reverse=True)
-        count=dict()
+        sorted_list=list()
+        previous_bet=0
+        cnt=0
+        list1=[new_list[0][1]]
+        item = new_list[0]
+        list_of_players=list()
+        
+        for x in new_list:
+            list_of_players.append(x[1])
+        print("This is list of players",list_of_players)
+
+
+        for p in new_list:
+            
+            print("This is item[0]",item[0],"This is p[0]",p[0])
+            if item == p:
+                continue
+            if item[0]==p[0]:
+                print("This is list1 in ties",list1)
+                list1.append(p[1])
+                #list_of_players.append(p[1])
+
+            else:
+                print("tis list 1",list1)
+                list1.sort(key=lambda x:x.player_bet)
+                #final_list=sorted(list1,key=lambda x:x.player_bet)
+                sorted_list.append(list1)
+                list1=list()
+                list1.append(p[1])
+                #list_of_players.append(p[1])
+                
+        print("list1 after",list1)
+        if len(list1)>0:
+            list1.sort(key=lambda x:x.player_bet)
+            #final_list=sorted(list1,key=lambda x:x.player_bet)
+            sorted_list.append(list1)
+            list1=list()
+            
+        print("sorted_list",sorted_list)
+        print("This is list of player",list_of_players)
+
+        
+        
+        rts_val=list()
+
+        for big_list in sorted_list:
+            
+            player=0
+            split_amount=len(big_list)
+            print("This is big_list",big_list)
+            for ties in big_list:
+                amount=self.hand_pot
+                for g in list_of_players:
+                    val = g.player_bet-ties.player_bet
+                    print("This is g.player_bet",g.player_bet,"This is ties.player_bet",ties.player_bet)
+                    print("This is val",val)
+                    if val < 0:
+                        val=0
+                    amount = amount - val
+                print("Tis amount eligle",amount)
+                self.hand_pot=self.hand_pot-(amount/split_amount)
+                print('This i s pot',self.hand_pot)
+                print("Tis amount won",amount/split_amount)
+                big_list[player].money=big_list[player].money+(amount/split_amount)
+                rts_val.append(big_list[player].money)
+                print("This is rts_val",rts_val)
+                print("This is split_amount",split_amount)
+                #big_list.remove(ties)
+                print("This is big_list",big_list)
+            
+                split_amount=split_amount-1
+                player=player+1
+                print("This is player",player)
+                
+           
+            if self.hand_pot==0:
+                if test:
+                    return rts_val
+                else:
+                    break
+            else:
+                print('In continue')
+                continue
+            
+
+
+            
+
+
+            
+            
+
+
+
+            
+
+        '''count=dict()
         rts_val=list()
         max_score=0
         for j in new_list:
             cot=0
-            
             if j[0] not in count:
                 count[j[0]]=[1,[j[1]]]
                 print("THis is count[j[0]]",count[j[0]])
@@ -839,7 +935,7 @@ class Hand():
                     print("In continue and p[1] bet=",p[1].player_bet)
                     print("This is p[1].money",p[1].money)
                     continue
-                
+                '''
                         
                 
     def check_winner(self,players_list):
