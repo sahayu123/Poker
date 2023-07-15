@@ -1,6 +1,7 @@
 import random
 from cards import Card
 from operator import itemgetter
+from utility import Utility
 
 
 class Hand():
@@ -25,9 +26,6 @@ class Hand():
         self.round_pot=0
         self.hand_pot=0
       
-
-       
-        
     def community_cards_deal(self,amount_cards,players_list):
         '''The community_cards_deal method of the hand class deals cards to the community cards attribute.
             parameters:
@@ -39,7 +37,11 @@ class Hand():
             self.community_cards.append(self.deck[jfk])
             self.deck.remove(self.deck[jfk])
             iter=iter+1
-        print(self.community_cards)
+        print("")
+        for x in self.community_cards:
+            print(x.number,x.suit)
+        print("")
+        #print(self.community_cards)
 
     def blinds_check(self,blinds):
         '''
@@ -50,21 +52,40 @@ class Hand():
         1. returns the internery number, for who should start the round, if YES is entered iternary variable will be 2, if no is entered iternary variable will be 0.
         '''
         if blinds=="YES":
-            self.small_blind.money=self.small_blind.money-1
-            self.small_blind.round_status="BET"
-            self.small_blind.player_bet=self.small_blind.player_bet+1
-            self.small_blind.player_bet_hand=self.small_blind.player_bet_hand+1
-            #print(self.small_blind.money)
+            if self.small_blind.money<=1:
+                self.small_blind.player_bet=self.small_blind.money
+                self.small_blind.player_bet_hand=self.small_blind.money
+                self.small_blind.round_status="All-In"
+                self.hand_poy=self.hand_pot+self.small_blind.money
+                self.round_pot=self.round_pot + self.small_blind.money
+                self.small_blind.money=0
+            else:
+                self.small_blind.money=self.small_blind.money-1
+                self.small_blind.round_status="BET"
+                self.small_blind.player_bet=1
+                self.small_blind.player_bet_hand=1
+                self.hand_pot=self.hand_pot+1
+                self.round_pot=self.round_pot+1
+                #print(self.small_blind.money)
+            if self.big_blind.money<=2:
+                self.big_blind.player_bet=self.big_blind.money
+                self.big_blind.player_bet_hand=self.big_blind.money
+                self.big_blind.round_status="All-In"
+                self.hand_poy=self.hand_pot+self.big_blind.money
+                self.round_pot=self.round_pot+self.big_blind.money
+                self.previous_bet=self.big_blind.money
+                self.small_blind.money=0
 
-            self.big_blind.money=self.big_blind.money-2
-            self.big_blind.round_status=None
-            self.big_blind.player_bet=self.big_blind.player_bet+2
-            self.big_blind.player_bet_hand=self.big_blind.player_bet_hand+2
-            #print(self.big_blind.money) 
-        
-            self.previous_bet=2   
-            self.hand_pot=3
-            self.round_pot=3
+
+            else:
+                self.big_blind.money=self.big_blind.money-2
+                self.big_blind.round_status=None
+                self.big_blind.player_bet=2
+                self.big_blind.player_bet_hand=2
+                self.hand_pot=self.hand_pot+2
+                self.round_pot=self.round_pot+2
+                self.previous_bet=2   
+                #print(self.big_blind.money) 
             z=2
             print("Small Blind is player ",self.small_blind.name," and has bet amount",self.small_blind.player_bet)
             print("Big Blind is player ",self.big_blind.name,"and has bet amount ",self.big_blind.player_bet)
@@ -75,7 +96,6 @@ class Hand():
         elif blinds=="NO":
             z=0
             self.previous_bet=0
-            self.hand_pot=0
             return z
 
     def imput_options(self,players_list,z,test="NO"):
@@ -86,17 +106,18 @@ class Hand():
         2.The second parameter is the iternary variable. 
         '''
         print("Player",z+1,"it is your turn")
-        if self.hand_pot>0 and players_list[z].player_bet_hand!=self.previous_bet:
+        if self.round_pot>0 and players_list[z].player_bet_hand!=self.previous_bet:
             self.decision1="Call"
                 
         else: 
             self.decision1=""
-        if self.hand_pot >0:
+        print('round pot',self.round_pot)
+        if self.round_pot >0:
             self.decision2="Raise"
         else:
             self.decision2=""
         self.decision3=""
-        if self.hand_pot==0:
+        if self.round_pot==0:
             self.decision3="Check"
             self.decision4="Bet"
         else:
@@ -105,8 +126,9 @@ class Hand():
         if players_list[z].player_bet_hand==self.previous_bet and players_list[z].round_status==None:
             self.decision3="Check"
         if test=="NO":
+            print("This is hand pot",self.hand_pot)
             players_list[z].round_status=input(f"Do you want to Fold {self.decision1} {self.decision2} {self.decision3} {self.decision4}  :")
-         
+    
     def call(self,players_list,z):
         '''
         The call method of the Hand class reacts to when the player wants to call and sets their attributes accordingly.
@@ -217,7 +239,8 @@ class Hand():
             players_list[z].player_bet_hand=players_list[z].player_bet_hand+int(bet_amount)
             self.previous_bet=int(bet_amount)
             self.round_pot=int(bet_amount)
-            self.hand_pot=self.hand+int(bet_amount)
+            print("This is hand pot befre",self.hand_pot)
+            self.hand_pot=self.hand_pot+int(bet_amount)
 
             players_list[z].money=players_list[z].money-int(bet_amount)
 
@@ -225,7 +248,7 @@ class Hand():
                 players_list[z].round_status="All_In"
 
             print("Player",z+1,"has bet amount",bet_amount)
-            print("Current pot is",self.hand)
+            print("Current pot is",self.hand_pot)
             z=(z+1)%len(players_list)
             break
         return z
@@ -286,7 +309,9 @@ class Hand():
                 pollos.player_bet_hand=0
                 pollos.round_status=None
             cont="NO"
+            print("This is hand pot",self.hand_pot)
             return cont
+            
         else:
             cont="YES"
             return cont
@@ -297,11 +322,14 @@ class Hand():
             1. The first parameter is the amout of community cards needed to be dealt in the round
             2. The second parameter is the list of players
             3. The third parameter  takes an input of YES or NO, if YES is entered blind values are intialized, if NO is entered,there will be no blind values. '''
-        
+        print("This is self.hand_pot",self.hand_pot)
+        self.round_pot=0
         players_list=player_list.copy()
         self.community_cards_deal(amount_cards,players_list)
         z=self.blinds_check(blinds)
-        while z < len(players_list):            
+        for x in players_list:
+                print("Name:",x.name,"Card 1",x.card_one.number,x.card_one.suit,"Card 2",x.card_one.number,x.card_two.suit)     
+        while z < len(players_list):
             if players_list[z].round_status=="Fold":
                 #print("This is fold z",z)
                 z=(z+1)%len(players_list)
@@ -321,6 +349,9 @@ class Hand():
                 self.players_in_game.remove(players_list[z])   
             elif players_list[z].round_status=="Check":
                 z=(z+1)%len(players_list)
+             
+            for x in players_list:
+                print("Name:",x.name,"Card 1",x.card_one.number,x.card_one.suit,"Card 2",x.card_two.number,x.card_two.suit)     
 
             cont=self.round_check(players_list)
             print(cont)
@@ -330,112 +361,7 @@ class Hand():
                 break
             elif cont=="WON":
                 return "NO_NEW_ROUND"
-#--------------------------------------------------------------------------------------------------------------   
-
-    def pairs_method(self,cards,val,need_high_card,x=False):
-        '''The pairs_method of the Hand class identifies if either a pair, three of a kind or a four of kind is present depending on the input
-        paramteres:
-            1.The first parameter is the list of cards
-            2.The second parameter is what kind of pair needs to be identified, either 2,3 or 4
-            3. The third parameter determins if a high cards should also be returned with the function
-            4. the fourth parameter is an optional parameter that determins how many cards should be returned
-        returns:
-            1. It returns either True or False depending if the item is present
-            2. It returns the list of cards that form the hand'''
-        print("Thi si sinput cards",cards)
-        item_present=False
-        count=dict()
-        for c in cards:
-            if c not in count:
-                count[c]=[1,[c]]
-                #print("This is number",count[c][1],"This is count",count[c][0])
-            else:
-                count[c][0]=count[c][0]+1
-                count[c][1].append(c)
-                #print("This is number",count[c],"This is count", count[c][0])
-            print("this is count",count)
-            if count[c][0]==val:
-                high_cards=list()
-                item_present=True
-                if need_high_card:
-                    for k in cards:
-                        print("This is first count[c][1]",count[c][1])
-                        print("This is k",k)
-                        if count[c][1][0] !=k:
-                            high_cards.append(k)
-                            print("This is high cards",high_cards)
-                    high_cards.sort(reverse=True)
-                    print("THis is high cards limited",high_cards[0:5-val])
-                    for j in high_cards[0:5-val]:
-                        print(count[c][1])
-                        count[c][1].append(j)
-                    print("This is count[c][1]",count[c][1])
-                    if x:
-                        return item_present,count[c][1][0:5-val]
-                    else:
-                        return item_present,count[c][1][0:5]
-                return item_present,count[c][1]    
-        return item_present,None   
-   
-    def multiple_pairs_method(self,cards,val):
-        '''The multiple_pairs_method of the Hand class identifies if either a two pair or a full house present depending on the input
-        paramteres:
-            1.The first parameter is the list of cards
-            2.The second parameter is what kind of pairs needs to be identified, either 2(for two pair) or 3(for full house)
-        
-        returns:
-            1. It returns either True or False depending if the item is present
-            2. It returns the list of cards that form the hand'''
-        if val==3:
-            need_high_card=False
-        else:
-            need_high_card=True
-        print("THis is need high card",need_high_card)
-        ret=self.pairs_method(cards,val,False)
-        print("THIS IS RET1",ret[1])
-        if ret[0]==False:
-            return ret
-        elif ret[0]==True:
-            new_cards=cards.copy()
-            old_cards=list()
-            for x in ret[1]:
-                old_cards.append(x)
-                new_cards.remove(x)
-            ret2=self.pairs_method(new_cards,2,need_high_card,True)
-            print("THIS IS RET2",ret2[1])
-            #print("This is ret2",ret2)
-            if ret2[0]==False:
-                return ret2
-            elif ret2[0]==True:
-                for x in ret2[1]:
-                    old_cards.append(x)
-                print("This is old cards",old_cards)
-                return ret2[0],old_cards
-       
-    def calculate_decimal_points(self,cards):
-        '''The calculate_decimal_points method of the hand class turns the player's hand into a decimal number
-        parameters:
-            1.The parameter is the list of cards
-        returns:
-            1.It returns the decimal value for the player's hand'''
-        new_cards=cards.copy()
-        print("This is new_cards",new_cards)
-        final_number=""
-        for jhy in new_cards:
-            print("This is jhy ",jhy)
-            if jhy<10:
-                final_number=final_number+"0"+str(jhy)
-                print("This is final_number",final_number)
-            else:
-                final_number=final_number+str(jhy)
-                print("This is final_number",final_number)
-        #14 10 14 09 06
-        #1,000,000,000
-        final_number_return_value=int(final_number)
-        print("This is final_number_return_value",final_number_return_value)
-        actual_final_number_return_value=final_number_return_value/10000000000
-        print("This is actual final number return value",actual_final_number_return_value)
-        return actual_final_number_return_value       
+#--------------------------------------------------------------------------------------------------------------        
 #-------------------------------------------------------------------------------------------------------------------
     def check_flush(self,p):       
         '''The check_flush method of the hand class will check if a flush is present in a Poker hand
@@ -463,25 +389,26 @@ class Hand():
         suit_count[p.card_two.suit][1].append(p.card_two.number_value) 
         print("This is card 2 suit",p.card_one.suit,"This is card 2 number",p.card_one.number)
         print("--------flush-----------------------------flush--------------------------------------")
+        utility=Utility()
         if suit_count["Clubs"][0]>=5:
             #print("This is suit_count lenght",len(suit_count["Clubs"][1]))
             suit_count["Clubs"][1].sort(reverse=True)
-            dec_val=self.calculate_decimal_points(suit_count["Clubs"][1][0:5])
+            dec_val=utility.calculate_decimal_points(suit_count["Clubs"][1][0:5])
             return True,suit_count["Clubs"][1][0:5],dec_val,suit_count["Clubs"][1]
 
         elif suit_count["Hearts"][0]>=5:
             suit_count["Hearts"][1].sort(reverse=True)
-            dec_val=self.calculate_decimal_points(suit_count["Hearts"][1][0:5])
+            dec_val=utility.calculate_decimal_points(suit_count["Hearts"][1][0:5])
             return True,suit_count["Hearts"][1][0:5],dec_val,suit_count["Hearts"][1]
                  
         elif suit_count["Diamonds"][0]>=5:
             suit_count["Diamonds"][1].sort(reverse=True)
-            dec_val=self.calculate_decimal_points(suit_count["Diamonds"][1][0:5])
+            dec_val=utility.calculate_decimal_points(suit_count["Diamonds"][1][0:5])
             return True,suit_count["Diamonds"][1][0:5],dec_val,suit_count["Diamonds"][1]
             
         elif suit_count["Spades"][0]>=5:
             suit_count["Spades"][1].sort(reverse=True)
-            dec_val=self.calculate_decimal_points(suit_count["Spades"][1][0:5])
+            dec_val=utility.calculate_decimal_points(suit_count["Spades"][1][0:5])
             return True,suit_count["Spades"][1][0:5],dec_val,suit_count["Spades"][1]
         else:
             return False,None,None,None
@@ -522,7 +449,8 @@ class Hand():
                 count=0
                 lst=list()
             if count==5:
-                dec_points=self.calculate_decimal_points(lst)
+                utility=Utility()
+                dec_points=utility.calculate_decimal_points(lst)
                 #j=False
                 return True,dec_points
             else:
@@ -565,11 +493,12 @@ class Hand():
         returns:
             1. True or False depending if the hand is present 
             2. Either thr point value of how strong the hand is or None if the hand isn't there'''
-        ret=self.pairs_method(cards,4,True)
+        utility=Utility()
+        ret=utility.pairs_method(cards,4,True)
         print("tHIS IS RET[1]",ret[1])
         if ret[1]==None:
             return False,None
-        soup=self.calculate_decimal_points(ret[1])
+        soup=utility.calculate_decimal_points(ret[1])
         return ret[0],soup
 
     def three_of_a_kind(self,p,cards):
@@ -580,10 +509,11 @@ class Hand():
         returns:
             1. True or False depending if the hand is present 
             2. Either thr point value of how strong the hand is or None if the hand isn't there'''
-        ret=self.pairs_method(cards,3,True)
+        utility=Utility()
+        ret=utility.pairs_method(cards,3,True)
         if ret[1]==None:
             return False,None
-        soup=self.calculate_decimal_points(ret[1])
+        soup=utility.calculate_decimal_points(ret[1])
         return ret[0],soup
     
     def pair(self,p,cards):
@@ -594,10 +524,11 @@ class Hand():
         returns:
             1. True or False depending if the hand is present 
             2. Either thr point value of how strong the hand is or None if the hand isn't there'''
-        ret=self.pairs_method(cards,2,True)
+        utility=Utility()
+        ret=utility.pairs_method(cards,2,True)
         if ret[1]==None:
             return False,None
-        soup=self.calculate_decimal_points(ret[1])
+        soup=utility.calculate_decimal_points(ret[1])
         return ret[0],soup
 
     def two_pair(self,p,cards):
@@ -608,10 +539,11 @@ class Hand():
         returns:
             1. True or False depending if the hand is present 
             2. Either thr point value of how strong the hand is or None if the hand isn't there'''
-        ret=self.multiple_pairs_method(cards,2)
+        utility=Utility()
+        ret=utility.multiple_pairs_method(cards,2)
         if ret[1]==None:
             return False,None
-        soup=self.calculate_decimal_points(ret[1])
+        soup=utility.calculate_decimal_points(ret[1])
         return ret[0],soup
     
     def full_house(self,p,cards):
@@ -622,10 +554,11 @@ class Hand():
         returns:
             1. True or False depending if the hand is present 
             2. Either thr point value of how strong the hand is or None if the hand isn't there'''
-        ret=self.multiple_pairs_method(cards,3)
+        utility=Utility()
+        ret=utility.multiple_pairs_method(cards,3)
         if ret[1]==None:
             return False,None
-        soup=self.calculate_decimal_points(ret[1])
+        soup=utility.calculate_decimal_points(ret[1])
         return ret[0],soup
 
     def high_card(self,p,cards):
@@ -736,8 +669,6 @@ class Hand():
                 split_amount=split_amount-1
                 player=player+1
                 print("This is player",player)
-                
-           
             if self.hand_pot==0:
                 if test:
                     return rts_val
@@ -746,198 +677,7 @@ class Hand():
             else:
                 print('In continue')
                 continue
-            
-
-
-            
-
-
-            
-            
-
-
-
-            
-
-        '''count=dict()
-        rts_val=list()
-        max_score=0
-        for j in new_list:
-            cot=0
-            if j[0] not in count:
-                count[j[0]]=[1,[j[1]]]
-                print("THis is count[j[0]]",count[j[0]])
-            else:
-                count[j[0]][0]=count[j[0]][0]+1
-                print("This is count[j[0]][0]",count[j[0]][0])
-                count[j[0]][1].append(j[1])
-        
-        max_score_list=info.copy()
-        for p in new_list:
-            if p[1].round_status=="All-In":
-                player_all_in=True
-            else:
-                player_all_in=False
-            print("This is count[p][0]",count[p[0]][0])
-            if count[p[0]][0]>1:
-                player_tied=True
-            else:
-                player_tied=False
-            print("This is player_all_in",player_all_in)
-            print("This is player tied",player_tied)
-
-
-            if player_all_in==False and player_tied==False:
-                print("this is pre self.hand_pot",self.hand_pot)
-                p[1].money=p[1].money+self.hand_pot
-                rts_val.append(p[1].money)
-                print("This is self.hand_pot",self.hand_pot)
-                self.hand_pot=0
-                if test:
-                    return rts_val
-                else:
-                    break
-            elif player_all_in==True and player_tied==False:
-                amount_won=0
-                i=0
-                max_score_list.remove(p)
-                for o in max_score_list:
-                    check=o[1].player_bet-p[1].player_bet
-                    if check<0:
-                        check=0
-                    i=i+check
-                    print("THis is i",i)
-                    o[1].player_bet=check
-                print("This is self.hand_pot",self.hand_pot)
-                print("This is p[1].money",p[1].money)
-                print("This is i",i)
-                p[1].money=p[1].money+self.hand_pot-i
-                rts_val.append(p[1].money)
-                self.hand_pot=i
-                if self.hand_pot==0:
-                    if test:
-                        return rts_val
-                    else:
-                        break
-                else:
-                    continue           
-               
-            elif player_all_in==False and player_tied==True:
-                l=0
-                for x in count[p[0]][1]:
-                    if x==p[1]:
-                        continue
-                    l=l+x.player_bet-p[1].player_bet
-                    if l<0:
-                        l=0
-                    print("This is l",l)
-                
-                print("This is len(ties)",count[p[0]][0])
-                val=(self.hand_pot-l)/count[p[0]][0]
-                print("This is val",val)
-                p[1].money=p[1].money+val
-                print("This is hand pot",self.hand_pot)
-                self.hand_pot=self.hand_pot-val
-                print("This is count",count[p[0]][1])
-                print("This is p[1]",p[1])
-                rts_val.append(p[1].money)
-                count[p[0]][1].remove(p[1])
-                count[p[0]][0]=count[p[0]][0]-1
-                max_score_list.remove(p)
-                if self.hand_pot==0:
-                    if test:
-                        return rts_val
-                    else:
-                        break
-                else:
-                    continue
-                       
-            elif player_tied==True and player_all_in==True:
-                #need to get how much the player can win
-                #need to divide the pot into side pots 
-    
-                val= a = tied_bets = cnt = cnt2 = new_amount  = 0
-                
-                
-                print("This is p[1].money",p[1].money)
-                amount=self.hand_pot
-                for x in max_score_list:
-                    val = x[1].player_bet-p[1].player_bet
-                    if val < 0:
-                        val=0
-                    amount = amount - val
-                   
-                print("This is count[p[0]][1]",count[p[0]][1])
-                sm=0
-                side_pots=dict()
-                side_pots_list=list()
-                i=False
-
-                for y in count[p[0]][1]:
-                    sm=sm+y.player_bet
-                    
-                    if p[1].player_bet>y.player_bet:
-                        i=True
-                        amount2=self.hand_pot
-                        for x in max_score_list:
-                            print("This is x",x[1])
-                            print("count[y[0]][1]",count[p[0]][1])
                             
-                            val = x[1].player_bet-y.player_bet
-                            print("This is val",val)
-                            if val < 0:
-                                val=0
-                            amount2 = amount2 - val
-                        print("This is pre pre side_pots_list",side_pots_list)
-                        if i:
-                            side_pots_list.append(amount2)
-                final_amount=0
-                minus_amount=0
-                div=count[p[0]][0]
-                side_pots_list.append(amount)
-                print("This is side_pots_list",side_pots_list)
-                side_pots_list.sort()
-                for h in side_pots_list:
-                    h=h-minus_amount
-                    final_amount=final_amount+(h/div)
-                    print("Final amount on",final_amount)
-                    div=div-1
-                    minus_amount=minus_amount+h
-                print("This is final_amount",final_amount)
-                
-               
-                
-                print("")
-                print("This is side_pots_List",side_pots_list)
-                
-                print("This is amount",amount)
-
-                
-                
-                #print("This is  pre self.hand_pot",self.hand_pot)
-            
-                p[1].money=p[1].money+final_amount
-                print("This is p[1].money",p[1].money)
-                self.hand_pot=self.hand_pot-final_amount
-                print("This is self.hand_pot",self.hand_pot)
-                
-                max_score_list.remove(p)
-                count[p[0]][0]=count[p[0]][0]-1
-                count[p[0]][1].remove(p[1])
-                rts_val.append(p[1].money)
-
-                if self.hand_pot==0:
-                    if test:
-                        return rts_val
-                    else:
-                        break
-                else:
-                    print("In continue and p[1] bet=",p[1].player_bet)
-                    print("This is p[1].money",p[1].money)
-                    continue
-                '''
-                        
-                
     def check_winner(self,players_list):
         '''The check_winner function of the hand class looks for the winner/winners of a Poker hand and allocates their money won accordingly
             parameters:

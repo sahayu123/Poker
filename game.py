@@ -6,12 +6,8 @@ class Game():
     def __init__ (self,player_list,deck):
         self.player_list=player_list
         self.deck=deck
-        self.small_blind_index=random.randint(0,len(self.player_list)-1)
-        hand=Hand(self.player_list,deck,self.small_blind_index)
-        hand.preflop()
-        hand.flop()
-        hand.turn()
-        hand.river()
+        
+    
     def remove_player_out_of_game(self,player_list):
         for p in player_list:
             if p.money<=0:
@@ -19,8 +15,6 @@ class Game():
                 print("Player",p.name,"has been removed from the game due to a lack of funds")
         return player_list
         
-
-
     def cash_out(self,player_list):
         while True:
             option=input("Does anybody want to cash out: Yes or No : ")
@@ -62,13 +56,19 @@ class Game():
             else:
                 print("Please enter valid input")
                 continue
-
-
-
+    
+    
     def other_rounds(self):
-        small_blind=self.first_small_blind
-        while len(self.player_list)>0:
-            
+        self.small_blind_index=random.randint(0,len(self.player_list)-1)
+       
+        hand=Hand(self.player_list,self.deck,self.small_blind_index)
+        hand.preflop()
+        hand.flop()
+        hand.turn()
+        hand.river()
+        while len(self.player_list)>1:
+            for p in self.player_list:
+                p.player_bet=0
             self.player_list=self.remove_player_out_of_game(self.player_list)
              
             self.player_list=self.cash_out(self.player_list)

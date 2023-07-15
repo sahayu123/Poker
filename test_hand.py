@@ -47,7 +47,7 @@ def test_input_function():
         deck.shuffle()
         deck1=deck.deal(num_players,players_list)
         hand=Hand(deck1,players_list)
-        hand.hand_pot=hand_pot_values[j]
+        hand.round_pot=hand_pot_values[j]
         hand.previous_bet=hand_previous_bet_values[j]
         z=z_values[j]
         hand.imput_options(players_list,z,"YES")
