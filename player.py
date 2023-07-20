@@ -10,8 +10,8 @@ class Player:
         self.player_bet=0
         self.player_bet_hand=0
         self.point_val=0
-        #self.name=input("please enter name:")
-        self.name="John"
+        self.name="no name"
+        
         
         
 

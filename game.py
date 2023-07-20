@@ -3,11 +3,13 @@ import random
 from deck import Deck
 from player import Player
 class Game():
-    def __init__ (self,player_list,deck):
+    def __init__ (self,player_list):
         self.player_list=player_list
-        self.deck=deck
+        deck=Deck()
+        deck.shuffle()
+        deck1=deck.deal(len(self.player_list),self.player_list)
+        self.deck=deck1
         
-    
     def remove_player_out_of_game(self,player_list):
         for p in player_list:
             if p.money<=0:

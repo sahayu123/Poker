@@ -105,7 +105,7 @@ class Hand():
         1.The first parameter is the list of players.
         2.The second parameter is the iternary variable. 
         '''
-        print("Player",z+1,"it is your turn")
+        print("Player",players_list[z].name,"it is your turn")
         if self.round_pot>0 and players_list[z].player_bet_hand!=self.previous_bet:
             self.decision1="Call"
                 
@@ -156,7 +156,7 @@ class Hand():
         
            
         print("This is player bet hand",players_list[z].player_bet_hand)
-        print("Player",z+1, "has called and has amount",players_list[z].money)
+        print("Player",players_list[z].name, "has called and has amount",players_list[z].money)
         print("Current pot is",self.hand_pot)
         #print("this is player bet hand",players_list[z].player_bet_hand)
         z=(z+1)%len(players_list)
@@ -205,7 +205,7 @@ class Hand():
         self.previous_bet = self.previous_bet +int(raise_amount)
 
 
-        print("Player", z+1, "has raised and has amount", players_list[z].money)
+        print("Player", playyer_list[z].name, "has raised and has amount", players_list[z].money)
         print("Current pot is", self.hand_pot)
         z = (z + 1) % len(players_list)  
         return z
@@ -247,7 +247,7 @@ class Hand():
             if players_list[z].money==0:
                 players_list[z].round_status="All_In"
 
-            print("Player",z+1,"has bet amount",bet_amount)
+            print("Player",players_list[z],"has bet amount",bet_amount)
             print("Current pot is",self.hand_pot)
             z=(z+1)%len(players_list)
             break
@@ -603,8 +603,9 @@ class Hand():
         item = new_list[0]
         list_of_players=list()
         
-        for x in new_list:
-            list_of_players.append(x[1])
+        list_of_players = [x[1] for x in new_list] 
+        # for x in new_list:
+        #     list_of_players.append(x[1])
         print("This is list of players",list_of_players)
 
 
