@@ -1,6 +1,7 @@
 import tkinter
 from player import Player
-from main_page import game
+from game import Game
+
 
 root=tkinter.Tk()
 root.title("Poker Game")
@@ -50,10 +51,10 @@ def start_the_game():
         informer_label["text"]="Please add at least two players before starting"
     else:
         informer_label["text"]="Game starting"
-        for widgets in root.winfo_children():
-            widgets.destroy()
-        game(players_list)
-
+        game=Game(players_list)
+        game.other_rounds(root)
+        
+        
 add_players_button=tkinter.Button(root,text="Add Player",command=add_player)
 add_players_button.place(relx=0.5,rely=0.6,anchor="center")
 

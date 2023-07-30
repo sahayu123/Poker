@@ -50,7 +50,7 @@ def test_input_function():
         hand.round_pot=hand_pot_values[j]
         hand.previous_bet=hand_previous_bet_values[j]
         z=z_values[j]
-        hand.imput_options(players_list,z,"YES")
+        hand.imput_options(players_list,z,test="YES")
         assert hand.decision1==hand_decision_1_values[j] and hand.decision2==hand_decision_2_values[j] and hand.decision3==hand_decision_3_values[j] and hand.decision4==hand_decision_4_values[j]
         j=j+1
 
@@ -332,6 +332,4 @@ def test_player_grade():
         j=hand.player_grade(point_list[w],True)
         print(j)
         assert j==val[w]
-        w=w+1
-
-
+        w=

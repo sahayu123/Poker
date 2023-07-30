@@ -5,11 +5,7 @@ from player import Player
 class Game():
     def __init__ (self,player_list):
         self.player_list=player_list
-        deck=Deck()
-        deck.shuffle()
-        deck1=deck.deal(len(self.player_list),self.player_list)
-        self.deck=deck1
-        
+               
     def remove_player_out_of_game(self,player_list):
         for p in player_list:
             if p.money<=0:
@@ -58,16 +54,22 @@ class Game():
             else:
                 print("Please enter valid input")
                 continue
-    
-    
-    def other_rounds(self):
+      
+    def other_rounds(self,root):
         self.small_blind_index=random.randint(0,len(self.player_list)-1)
        
+        deck=Deck()
+        deck.shuffle()
+        self.deck=deck.deal(len(self.player_list),self.player_list)
+
         hand=Hand(self.player_list,self.deck,self.small_blind_index)
-        hand.preflop()
-        hand.flop()
-        hand.turn()
-        hand.river()
+        
+        hand.preflop(root)
+        hand.flop(root)
+        hand.turn(root)
+        hand.river(root)
+
+
         while len(self.player_list)>1:
             for p in self.player_list:
                 p.player_bet=0
@@ -77,21 +79,25 @@ class Game():
             self.player_list=self.cash_in(self.player_list)
 
             self.small_blind_index=(self.small_blind_index+1)%len(self.player_list)
-
+            
             deck=Deck()
             deck.shuffle()
+            
 
             self.deck=deck.deal(len(self.player_list),self.player_list)
 
             hand=Hand(self.player_list,self.deck,self.small_blind_index)
-            hand.preflop()
-            hand.flop()
-            hand.turn()
-            hand.river()
+
+            hand.preflop(root)
+            hand.flop(root)
+            hand.turn(root)
+            hand.river(root)
+
         
         print("Game Over")
         print("Player",player_list[0].name,"is the winner")
-
+    
+    
 
 
 
