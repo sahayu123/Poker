@@ -21,7 +21,7 @@ class Hand():
         self.small_blind=self.players_list[0]
         self.big_blind=self.players_list[1]
         self.community_cards=list()
-        self.players_in_game=self.players_list
+        self.players_in_game=self.players_list.copy()
         self.round_pot=0
         self.hand_pot=0
        
@@ -43,7 +43,7 @@ class Hand():
         print("")
         #print(self.community_cards)
 
-    def blinds_check(self,blinds):
+    def blinds_check(self,blinds,player_list):
         '''
         The blinds_check method of the Hand class, sets the blind attributes and intiazlizes the start of the game.
         parameters:
@@ -51,7 +51,9 @@ class Hand():
         returns:
         1. returns the internery number, for who should start the round, if YES is entered iternary variable will be 2, if no is entered iternary variable will be 0.
         '''
+        print("in blinds check")
         if blinds=="YES":
+            print("in blinds yes")
             if self.small_blind.money<=1:
                 self.small_blind.player_bet=self.small_blind.money
                 self.small_blind.player_bet_hand=self.small_blind.money
@@ -74,7 +76,7 @@ class Hand():
                 self.hand_poy=self.hand_pot+self.big_blind.money
                 self.round_pot=self.round_pot+self.big_blind.money
                 self.previous_bet=self.big_blind.money
-                self.small_blind.money=0
+                self.big_blind.money=0
 
 
             else:
@@ -85,8 +87,9 @@ class Hand():
                 self.hand_pot=self.hand_pot+2
                 self.round_pot=self.round_pot+2
                 self.previous_bet=2   
+                print("this is previous bet in blinds check",self.previous_bet)
                 #print(self.big_blind.money) 
-            z=2
+            z=2%len(player_list)
             print("Small Blind is player ",self.small_blind.name," and has bet amount",self.small_blind.player_bet)
             print("Big Blind is player ",self.big_blind.name,"and has bet amount ",self.big_blind.player_bet)
             print("")
@@ -94,11 +97,12 @@ class Hand():
             
         
         elif blinds=="NO":
+            print("in blinds no")
             z=0
             self.previous_bet=0
             return z
 
-    def call(self,players_list,z):
+    def call(self,players_list,z,root):
         '''
         The call method of the Hand class reacts to when the player wants to call and sets their attributes accordingly.
         parameters:
@@ -123,7 +127,8 @@ class Hand():
             players_list[z].player_bet=players_list[z].player_bet+(self.previous_bet-players_list[z].player_bet_hand)
             players_list[z].player_bet_hand=players_list[z].player_bet_hand+(self.previous_bet-players_list[z].player_bet_hand)
         
-           
+        
+        
         print("This is player bet hand",players_list[z].player_bet_hand)
         print("Player",players_list[z].name, "has called and has amount",players_list[z].money)
         print("Current pot is",self.hand_pot)
@@ -133,7 +138,7 @@ class Hand():
         print(players_list)
         return z
    
-    def Raise(self,players_list,z):
+    def Raise(self,players_list,z,root):
       
         '''
         The Raise method of the Hand class reacts to when the player wants to Raise and sets their attributes accordingly.
@@ -143,8 +148,17 @@ class Hand():
         returns:
         1. It returns the itinerary variable.
         '''
+        def cont():
+            self.cont.set(1)
         while True:
-            raise_amount = input("Please enter raise amount: ")
+            self.cont=tkinter.IntVar()
+            raise_input_box=tkinter.Entry(root)
+            raise_input_box.place(relx=0.7,rely=0.5,anchor="center")
+            raise_button=tkinter.Button(root,text="Place Raise Amount",command=cont)
+            raise_button.place(relx=0.9,rely=0.5,anchor="center")
+            root.wait_variable(self.cont)
+            raise_amount=raise_input_box.get()
+            
             try:
                 players_list[z].player_bet = players_list[z].player_bet + (self.previous_bet - players_list[z].player_bet_hand) + int(raise_amount)
             except:
@@ -179,7 +193,7 @@ class Hand():
         z = (z + 1) % len(players_list)  
         return z
    
-    def bet(self,players_list,z,):
+    def bet(self,players_list,z,root):
         '''
         The bet method of the Hand class reacts to when the player wants to bet and sets their attributes accordingly.
         parameters:
@@ -188,8 +202,17 @@ class Hand():
         returns:
         1.It returns the itenary variable.
         '''
+        
         while True:
-            bet_amount=input("Please enter bet amount :")
+            def cont():
+                self.cont.set(1)
+            self.cont=tkinter.IntVar()
+            bet_input_box=tkinter.Entry(root)
+            bet_input_box.place(relx=0.7,rely=0.5,anchor="center")
+            bet_button=tkinter.Button(root,text="Place Bet Amount",command=cont)
+            bet_button.place(relx=0.9,rely=0.5,anchor="center")
+            root.wait_variable(self.cont)
+            bet_amount=bet_input_box.get()
             try:
                 players_list[z].player_bet=players_list[z].player_bet+int(bet_amount)
             except:
@@ -265,12 +288,13 @@ class Hand():
         print("Ya arrah 2")
         #players_list[z].round_status=input(f"Do you want to Fold {self.decision1} {self.decision2} {self.decision3} {self.decision4}  :")
         
-    def round_check(self,players_list):
+    def round_check(self,players_list,root):
         '''The round_check of the Hand class, checks if the round is over or not and it checks if there is a winner through folding.
         parameters:
         1.The frst parameter is the list of players
         returns:
         1.It returns YES or NO, it returns YES, when the round should continue and NO when the round should end. '''
+        print("In round check")
         check="YES"
         check2="YES"    
         jst=list()
@@ -297,10 +321,14 @@ class Hand():
             if stab=="NO":
                 check="NO"
                 cont="WON"
+                for widgets in root.winfo_children():
+                    widgets.destroy()
                 return cont
             elif v.round_status==None:
                 check="NO"
                 break  
+            elif v.round_status=="Fold":
+                continue
             elif v.round_status=="All-In":
                 continue
             jst.append(v.player_bet_hand)
@@ -341,7 +369,7 @@ class Hand():
         self.round_pot=0
         players_list=player_list.copy()
         self.community_cards_deal(amount_cards,players_list)
-        z=self.blinds_check(blinds)
+        z=self.blinds_check(blinds,players_list)
        
         
         for x in players_list:
@@ -356,6 +384,17 @@ class Hand():
                 continue
             for widgets in root.winfo_children():
                 widgets.destroy()
+            self.cont=tkinter.IntVar()
+            show_player_stats=tkinter.Text(root,height=3,width=30,yscrollcommand=True,xscrollcommand=True)
+            show_player_stats.place(relx=0.905,rely=0.8,anchor="center")
+            player_money="Money "+str(players_list[z].money)+"\n"
+            show_player_stats.insert(tkinter.END,player_money)
+            player_bet_hand="Amount bet this round "+str(players_list[z].player_bet_hand)+"\n"
+            show_player_stats.insert(tkinter.END,player_bet_hand)
+            player_bet="Amount bet in total "+str(players_list[z].player_bet)+"\n"
+            show_player_stats.insert(tkinter.END,player_bet)
+            show_player_stats.config(state=("disabled"))
+            
                 
 #----------------------------------------------------------------------------------------------------
             player_tell_label=tkinter.Label(root,font=("Times 21"))
@@ -365,55 +404,109 @@ class Hand():
             player_your_cards_label=tkinter.Label(root,text="Your cards",font=("Times 14"))
             player_your_cards_label.place(relx=0.5,rely=0.6,anchor="center")
             
-            card_one_image=tkinter.Label(root)
+            card_one_image=tkinter.Button(root,command=lambda :show_card_one(players_list,z,card_one_image,card_two_image))
+            k=Image.open("PNG-cards-1.3/b.png")
+            image=k.resize((150,250))
+            img_to_add=ImageTk.PhotoImage(image)
+            card_one_image["image"]=img_to_add
             card_one_image.place(relx=0.4,rely=0.8,anchor="center")
+           
 
-            card_one_number=players_list[z].card_one.number
-            card_one_suit=players_list[z].card_one.suit
-
-            new_card_one_number=card_one_number.lower()
-            new_card_one_suit=card_one_suit.lower()
-
-            image_to_open=f"{new_card_one_number}_of_{new_card_one_suit}.png"
-            
-            td=Image.open('PNG-cards-1.3/'+image_to_open)
-            image=td.resize((150,250))
-
-            img=ImageTk.PhotoImage(image)
-
-            card_one_image["image"]=img
-
-            card_two_image=tkinter.Label(root)
+            card_two_image=tkinter.Button(root,command=lambda :show_card_one(players_list,z,card_one_image,card_two_image))
             card_two_image.place(relx=0.6,rely=0.8,anchor="center")
-
-            card_two_number=players_list[z].card_two.number
-            card_two_suit=players_list[z].card_two.suit
-
-            new_card_two_number=card_two_number.lower()
-            new_card_two_suit=card_two_suit.lower()
-
-            image_to_open2=f"{new_card_two_number}_of_{new_card_two_suit}.png"
+            k2=Image.open("PNG-cards-1.3/b.png")
+            image2=k2.resize((150,250))
+            img_to_add2=ImageTk.PhotoImage(image2)
+            card_two_image["image"]=img_to_add2
+            self.card_open=False
             
-            td2=Image.open('PNG-cards-1.3/'+image_to_open2)
-            image2=td2.resize((150,250))
 
-            img2=ImageTk.PhotoImage(image2)
+            def show_card_one(players_list,z,card_one_image,card_two_image):
+                if self.card_open:
+                    k=Image.open("PNG-cards-1.3/b.png")
+                    image=k.resize((150,250))
+                    self.img=ImageTk.PhotoImage(image)
+                    card_one_image["image"]=self.img
+                    self.img2=ImageTk.PhotoImage(image)
+                    card_two_image["image"]=self.img2
+                    self.card_open=False
+                else:
+                    card_one_number=players_list[z].card_one.number
+                    card_one_suit=players_list[z].card_one.suit
 
-            card_two_image["image"]=img2
+                    new_card_one_number=card_one_number.lower()
+                    new_card_one_suit=card_one_suit.lower()
+
+                    image_to_open=f"{new_card_one_number}_of_{new_card_one_suit}.png"
+                
+                    td=Image.open('PNG-cards-1.3/'+image_to_open)
+                    image=td.resize((150,250))
+                    self.img=ImageTk.PhotoImage(image)
+    
+                    card_one_image["image"]=self.img
+
+                    card_two_number=players_list[z].card_two.number
+                    card_two_suit=players_list[z].card_two.suit
+
+                    new_card_two_number=card_two_number.lower()
+                    new_card_two_suit=card_two_suit.lower()
+
+                    image_to_open2=f"{new_card_two_number}_of_{new_card_two_suit}.png"
+                    
+                    td2=Image.open('PNG-cards-1.3/'+image_to_open2)
+                    image2=td2.resize((150,250))
+
+                    self.img2=ImageTk.PhotoImage(image2)
+                    card_two_image["image"]=self.img2
+                    self.card_open=True
+            
+            def show_card_two(players_list,z,card_two_image):
+                if self.card_open:
+                    k=Image.open("PNG-cards-1.3/b.png")
+                    image=k.resize((150,250))
+                    self.img2=ImageTk.PhotoImage(image)
+                    card_two_image["image"]=self.img2
+                    self.card_two_open=False
+                else:
+                    card_two_number=players_list[z].card_two.number
+                    card_two_suit=players_list[z].card_two.suit
+
+                    new_card_two_number=card_two_number.lower()
+                    new_card_two_suit=card_two_suit.lower()
+
+                    image_to_open2=f"{new_card_two_number}_of_{new_card_two_suit}.png"
+                    
+                    td2=Image.open('PNG-cards-1.3/'+image_to_open2)
+                    image2=td2.resize((150,250))
+
+                    self.img2=ImageTk.PhotoImage(image2)
+
+                    card_two_image["image"]=self.img2
+                    self.card_open=True
 #--------------------------------------------------------------------------------------------------
             
-
+            
             show_players_bet=tkinter.Text(root,height=3,width=40,yscrollcommand=True,xscrollcommand=True)
             show_players_bet.config(state=("disabled"))
             show_players_bet.place(relx=0.7,rely=0.1,anchor="center")
+            print(self.previous_bet)
+            amount_needed_to_match=tkinter.Label(root,font=("Times 13"))
+            amount_needed_to_match["text"]="You need to bet at least amount   "+str(self.previous_bet-players_list[z].player_bet_hand)
+            amount_needed_to_match.place(relx=0.15,rely=0.8,anchor="center")
+
+            current_pot_label=tkinter.Label(root,font=("Times 13"))
+            current_pot_label["text"]="Current pot is "+str(self.hand_pot)
+            current_pot_label.place(relx=0.15,rely=0.7,anchor="center")
             try_next_card=True
             print(self.community_cards)
-            def set_image_to_card(community_card,card):
+
+            def set_image_to_card(card):
+                print('This is card ',card)
                 community_card_number=self.community_cards[card].number
-                print(community_card_number)
+                print("This is community_card_number",community_card_number)
 
                 community_card_suit=self.community_cards[card].suit
-                print(community_card_suit)
+                print("This is community_card_suit",community_card_suit)
                 print("check")
                 new_community_card_number=community_card_number.lower()
                 new_community_card_suit=community_card_suit.lower()
@@ -421,98 +514,128 @@ class Hand():
 
                 image_to_open=f"{new_community_card_number}_of_{new_community_card_suit}.png"
                 print("This is image to open",image_to_open)
-                td=Image.open('PNG-cards-1.3/'+image_to_open)
-                image=td.resize((150,250))
-
-                img=ImageTk.PhotoImage(image)
-
-                community_card["image"]=img
+                return image_to_open
+            
             try:
+                rt=set_image_to_card(0)
                 community_card_one_image=tkinter.Label(root)
                 community_card_one_image.place(relx=0.1,rely=0.3,anchor="center")
-                print("-")
-                set_image_to_card(community_card_one_image,0) 
-                print("-")
+                td3=Image.open('PNG-cards-1.3/'+rt)
+                image3=td3.resize((150,250))
+                img3=ImageTk.PhotoImage(image3)
+                community_card_one_image["image"]=img3
             except IndexError:
                 print("There is an error")
                 try_next_card=False
 
             if try_next_card:
                 try:
+                    rt2=set_image_to_card(1)
                     community_card_two_image=tkinter.Label(root)
                     community_card_two_image.place(relx=0.3,rely=0.3,anchor="center")
-                    set_image_to_card(community_card_two_image,1) 
+                    print("rt2",rt2)
+                    td4=Image.open('PNG-cards-1.3/'+rt2)
+                    image4=td4.resize((150,250))
+                    img4=ImageTk.PhotoImage(image4)
+                    community_card_two_image["image"]=img4
+                   
                 except IndexError:
                     try_next_card=False
 
             if try_next_card:
                 try:
+                    rt3=set_image_to_card(2)
                     community_card_three_image=tkinter.Label(root)
                     community_card_three_image.place(relx=0.5,rely=0.3,anchor="center")
-                    set_image_to_card(community_card_three_image,2) 
+                    td5=Image.open('PNG-cards-1.3/'+rt3)
+                    image5=td5.resize((150,250))
+                    img5=ImageTk.PhotoImage(image5)
+                    community_card_three_image["image"]=img5
                 except IndexError:
                     try_next_card=False
                 
             if try_next_card:
                 try:
+                    rt4=set_image_to_card(3)
                     community_card_four_image=tkinter.Label(root)
                     community_card_four_image.place(relx=0.7,rely=0.3,anchor="center")
-                    set_image_to_card(community_card_four_image,3) 
+                    td6=Image.open('PNG-cards-1.3/'+rt4)
+                    image6=td6.resize((150,250))
+                    img6=ImageTk.PhotoImage(image6)
+                    community_card_four_image["image"]=img6
                 except IndexError:
                     try_next_card=False
             
             if try_next_card:
                 try:
+                    rt5=set_image_to_card(4)
                     community_card_five_image=tkinter.Label(root)
                     community_card_five_image.place(relx=0.9,rely=0.3,anchor="center")
-                    set_image_to_card(community_card_five,image,4) 
+                    td7=Image.open('PNG-cards-1.3/'+rt5)
+                    image7=td7.resize((150,250))
+                    img7=ImageTk.PhotoImage(image7)
+                    community_card_five_image["image"]=img7
                 except IndexError:
                     try_next_card=False
 
 
 
-            
-
-
-
-            for x in players_list:
-
-                add_thing="Player "+x.name+" has bet amount "+str(x.player_bet)+"\n"
-                show_players_bet.config(state=("normal"))
-                show_players_bet.insert(tkinter.END,add_thing)
-                show_players_bet.config(state=("disabled"))
+            print("This is players_list",players_list)
+            for x in self.players_list:
+                if x.round_status=="Fold":
+                    add_thing="Player "+x.name+" has folded \n"
+                    show_players_bet.config(state=("normal"))
+                    show_players_bet.insert(tkinter.END,add_thing)
+                    show_players_bet.config(state=("disabled"))
+                else:
+                    add_thing="Player "+x.name+" has bet amount "+str(x.player_bet)+"\n"
+                    show_players_bet.config(state=("normal"))
+                    show_players_bet.insert(tkinter.END,add_thing)
+                    show_players_bet.config(state=("disabled"))
 
             self.button_clicked=tkinter.IntVar()
             self.imput_options(players_list,z,root)
             print("out of imput_options")
+            def on_closing():
+                print("Root window is closing...")
+                self.button_clicked.set(1)
+                self.cont.set(1)
+                root.destroy()  
+                
+            root.protocol("WM_DELETE_WINDOW", on_closing)
             root.wait_variable(self.button_clicked)
+
+                
+            
 
             print("This is players round status",players_list[z].round_status)
 
             if  players_list[z].round_status=="Call":
                 print("In Call")
-                z=self.call(players_list,z)
+                z=self.call(players_list,z,root)
             elif players_list[z].round_status=="Raise":
-                z=self.Raise(players_list,z)
+                z=self.Raise(players_list,z,root)
             elif players_list[z].round_status=="Bet":
-                z=self.bet(players_list,z)
+                z=self.bet(players_list,z,root)
             elif players_list[z].round_status=="Fold":
+                self.players_in_game.remove(players_list[z])
                 z=(z+1)%len(players_list)
-                self.players_in_game.remove(players_list[z])   
             elif players_list[z].round_status=="Check":
                 z=(z+1)%len(players_list)
             else:
-                print("ya arrah 4")
+                break
             for x in players_list:
                 print("Name:",x.name,"Card 1",x.card_one.number,x.card_one.suit,"Card 2",x.card_two.number,x.card_two.suit)     
-            cont=self.round_check(players_list)
+            cont=self.round_check(players_list,root)
             print(cont)
+            
             if cont=="YES":
                 continue
             elif cont=="NO":
                 break
             elif cont=="WON":
                 return "NO_NEW_ROUND"
+            
             root.mainloop()
 
            
@@ -723,11 +846,7 @@ class Hand():
             2. The second parameter is the cards
         returns:
             1. returns the point value for the high card for a hand'''
-        the_cards=list()
-        for x in cards:
-            the_cards.append(x)
-        the_cards.sort(reverse=True)
-        new_cards=the_cards[0:5]
+        new_cards=cards[0:5]
         final_number=""
         for jhy in new_cards:
             print("This is jhy ",jhy)
@@ -745,7 +864,7 @@ class Hand():
         print("This is actual final number return value",actual_final_number_return_value)
         return actual_final_number_return_value
 #----------------------------------------------------------------------------------------------------------------
-    def player_grade(self,info,test=False):
+    def player_grade(self,info,root,test=False):
         '''The player_grade function of the hand class identifies the winner/winners of a Poker hand based on the value of their hand and allocate the money to them accordingly
         parameters:
                 1. A list of the value of a player's hand and the player object.
@@ -762,7 +881,12 @@ class Hand():
         # for x in new_list:
         #     list_of_players.append(x[1])
         print("This is list of players",list_of_players)
+        player_money_display=tkinter.Text(root,height=8,width=50,yscrollcommand=True,xscrollcommand=True)
+        player_money_display.place(relx=0.5,rely=0.3,anchor="center")
+        player_money_display.config(state=("disabled"))
 
+        title_label=tkinter.Label(root,text="Winner(s) and Loser(s)",font=("Times 21"))
+        title_label.place(relx=0.5,rely=0.1,anchor="center")
 
         for p in new_list:
             
@@ -794,9 +918,9 @@ class Hand():
         print("This is list of player",list_of_players)
 
         
-        
+        winner_list=list()
         rts_val=list()
-
+        
         for big_list in sorted_list:
             
             player=0
@@ -821,34 +945,53 @@ class Hand():
                 print("This is split_amount",split_amount)
                 #big_list.remove(ties)
                 print("This is big_list",big_list)
-            
+                winner_info=ties.name+" has won amount "+str(amount/split_amount) +" and has amount "+str(ties.money)+"\n"
+                player_money_display.config(state=("normal"))
+                player_money_display.insert(tkinter.END,winner_info)
+                player_money_display.config(state=("disabled"))
+                winner_list.append(ties)
                 split_amount=split_amount-1
                 player=player+1
                 print("This is player",player)
+                
             if self.hand_pot==0:
                 if test:
                     return rts_val
                 else:
+                    player_money_display.config(state=("normal"))
+                    player_money_display.insert(tkinter.END,"-------------------------------------------------- \n")
+                    player_money_display.config(state=("disabled"))
+                    for p in self.players_list:
+                        if p in winner_list:
+                            continue 
+                        else:
+                            loser_info=p.name+" has lost and has amount "+str(p.money)+"\n"
+                            player_money_display.config(state=("normal"))
+                            player_money_display.insert(tkinter.END,loser_info)
+                            player_money_display.config(state=("disabled"))
                     break
             else:
                 print('In continue')
                 continue
                             
-    def check_winner(self,players_list):
+    def check_winner(self,players_list,root):
         '''The check_winner function of the hand class looks for the winner/winners of a Poker hand and allocates their money won accordingly
             parameters:
             1. the list of players in the game 
             '''
+        for widgets in root.winfo_children():
+            widgets.destroy()
         points_list=list()
+        print(len(players_list))
         for p in players_list:
             list_cards=list()
-            cards=self.community_cards
+            cards=self.community_cards.copy()
             cards.append(p.card_one)
             cards.append(p.card_two)
             for c in cards:
                 list_cards.append(c.number_value)
             list_cards.sort(reverse=True)
-
+            
             val=self.check_straight_flush(p)
             if val[0]==True:
                 point_value=9+val[1]
@@ -921,11 +1064,11 @@ class Hand():
                 continue
                 #return "PAIR"
             elif val[0]==False:
-                high_card_value=self.high_card(p,cards)
+                high_card_value=self.high_card(p,list_cards)
                 points_list.append([high_card_value,p])
                 p.point_val=high_card_value
                 #return "HIGH_CARD"
-        self.player_grade(points_list)
+        self.player_grade(points_list,root)
             
     def preflop(self,root):
         '''The preflop method of the Hand class implemets betting for the preflop round'''
@@ -946,6 +1089,6 @@ class Hand():
         if self.new_round != "NO_NEW_ROUND":
             self.new_round=self.round_betting(1,self.players_in_game,"NO",root)   
             if self.new_round !="NOw_NEW_ROUND":
-                self.check_winner(self.players_in_game)
+                self.check_winner(self.players_in_game,root=root)
                
     
