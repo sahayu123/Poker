@@ -24,6 +24,7 @@ class Hand():
         self.players_in_game=self.players_list.copy()
         self.round_pot=0
         self.hand_pot=0
+        self.stop_next_turn=False
        
       
     def community_cards_deal(self,amount_cards,players_list):
@@ -111,16 +112,19 @@ class Hand():
         returns:
         1.It returns the itenary variable.
         '''
-        
+        print("self.previous_bet",self.previous_bet-players_list[z].player_bet_hand)
         if int(self.previous_bet-players_list[z].player_bet_hand) >= players_list[z].money:
             players_list[z].round_status="All_In"
+           
+            print("All_In detected")
             self.hand_pot=self.hand_pot+players_list[z].money
             self.round_pot=self.round_pot+players_list[z].money
-            players_list[z].players_bet=players_list[z].player_bet+players_list[z].money
-            players_list[z].players_bet_hand=players_list[z].player_bet_hand+players_list[z].money
+            players_list[z].player_bet=players_list[z].player_bet+players_list[z].money
+            players_list[z].player_bet_hand=players_list[z].player_bet_hand+players_list[z].money
             players_list[z].money=0
         
         else:
+            print("In normal call")
             players_list[z].money=players_list[z].money-(self.previous_bet-players_list[z].player_bet_hand)
             self.hand_pot=self.hand_pot+(self.previous_bet-players_list[z].player_bet_hand)
             self.round_pot=self.round_pot+(self.previous_bet-players_list[z].player_bet_hand)
@@ -128,7 +132,7 @@ class Hand():
             players_list[z].player_bet_hand=players_list[z].player_bet_hand+(self.previous_bet-players_list[z].player_bet_hand)
         
         
-        
+        print("Players after round status",players_list[z].round_status)
         print("This is player bet hand",players_list[z].player_bet_hand)
         print("Player",players_list[z].name, "has called and has amount",players_list[z].money)
         print("Current pot is",self.hand_pot)
@@ -179,15 +183,19 @@ class Hand():
         print("THis is player_bet_hand",players_list[z].player_bet_hand)
         self.hand_pot = self.hand_pot + (self.previous_bet - players_list[z].player_bet_hand) + int(raise_amount)
         self.round_pot = self.round_pot + (self.previous_bet-players_list[z].player_bet_hand)+int(raise_amount)
-        players_list[z].money = players_list[z].money - (self.previous_bet-players_list[z].player_bet_hand)+int(raise_amount)
-
+        print("Players_list[z].money before#############################",players_list[z].money)
+        print("raise amount:",raise_amount,"self.previous_bet:",self.previous_bet,"players_list[z].player_bet_hand:",players_list[z].player_bet_hand)
+        players_list[z].money = players_list[z].money -( (self.previous_bet-players_list[z].player_bet_hand)+int(raise_amount))
+        print("This is the amount getting minused from player money",str((self.previous_bet-players_list[z].player_bet_hand)+int(raise_amount)))
+        print("Players_list[z].money after",players_list[z].money)
         if players_list[z].money==0:
+            print("All_In deteted*********************************************************************")
             players_list[z].round_status="All_In"
 
         players_list[z].player_bet_hand = players_list[z].player_bet_hand + (self.previous_bet-players_list[z].player_bet_hand)+int(raise_amount)
         self.previous_bet = self.previous_bet +int(raise_amount)
 
-
+        print("Players after round status",players_list[z].round_status)
         print("Player", players_list[z].name, "has raised and has amount", players_list[z].money)
         print("Current pot is", self.hand_pot)
         z = (z + 1) % len(players_list)  
@@ -238,9 +246,11 @@ class Hand():
 
             if players_list[z].money==0:
                 players_list[z].round_status="All_In"
+                print("All_In detected")
 
             print("Player",players_list[z],"has bet amount",bet_amount)
             print("Current pot is",self.hand_pot)
+            print("Players after round status",players_list[z].round_status)
             z=(z+1)%len(players_list)
             break
         return z
@@ -252,14 +262,18 @@ class Hand():
         1.The first parameter is the list of players.
         2.The second parameter is the iternary variable. 
         '''
-        
+        self.clicked=False
         def set_round_status(round_status,players_list,z):
-            players_list[z].round_status=round_status
-            print("This is player round status",players_list[z].round_status)
-            self.button_clicked.set(1)
-            print("This is button clicked",self.button_clicked)
-            #z=self.call(players_list,z)
-            print("Ya arrah")
+            if self.clicked:
+                pass
+            else:
+                players_list[z].round_status=round_status
+                print("This is player round status",players_list[z].round_status)
+                self.button_clicked.set(1)
+                print("This is button clicked",self.button_clicked)
+                #z=self.call(players_list,z)
+                print("Ya arrah")
+                self.clicked=True
         fold_button=tkinter.Button(root,text="Fold",command=lambda :set_round_status("Fold",players_list,z))
         fold_button.place(relx=0.5,rely=0.5,anchor="center")    
         #print("Player",players_list[z].name,"it is your turn")
@@ -295,6 +309,7 @@ class Hand():
         returns:
         1.It returns YES or NO, it returns YES, when the round should continue and NO when the round should end. '''
         print("In round check")
+        self.stop_next_turn=False
         check="YES"
         check2="YES"    
         jst=list()
@@ -302,6 +317,7 @@ class Hand():
         jaz=0
         stab="YES"
         cont="k"
+        all_in_var=0
         for v in players_list:
             #print(v.round_status)
             if v.round_status=="Fold":
@@ -315,7 +331,9 @@ class Hand():
                             print(g.name,"wins")
                             print(g.name,"has amount",g.money)
                             stab="NO" 
-                            break  
+                            break
+            
+
                                         
         for v in players_list:
             if stab=="NO":
@@ -329,13 +347,17 @@ class Hand():
                 break  
             elif v.round_status=="Fold":
                 continue
-            elif v.round_status=="All-In":
+            elif v.round_status=="All_In":
+                print("In all in round check")
                 continue
             jst.append(v.player_bet_hand)
             mk.append(v)
 
         if check=="YES":
-            s1=jst[0]
+            try:
+                s1=jst[0]
+            except:
+                return "NO"
             for c in jst:
                 print(c)
                 if c!=s1:
@@ -365,23 +387,44 @@ class Hand():
         print("This is self.hand_pot",self.hand_pot)
         for widgets in root.winfo_children():
             widgets.destroy()
-            
+     
         self.round_pot=0
         players_list=player_list.copy()
         self.community_cards_deal(amount_cards,players_list)
         z=self.blinds_check(blinds,players_list)
-       
-        
-        for x in players_list:
-                print("Name:",x.name,"Card 1",x.card_one.number,x.card_one.suit,"Card 2",x.card_one.number,x.card_two.suit)     
+        stop_next_turn=False
         while z < len(players_list):
+            for x in players_list:
+                print(x.name,"round status :",x.round_status)
+            j=0 
+            for x in players_list:
+                if x.round_status=="All_In":
+                    j=j+1
+                elif x.round_status=="Fold":
+                    j=j+1
+            if j==len(players_list):
+                break
+            if j==len(players_list)-1:
+                stop_next_turn=True
+            print("j   ::   ",j)
+            
             if players_list[z].round_status=="Fold":
                 #print("This is fold z",z)
+                
                 z=(z+1)%len(players_list)
                 continue
             elif players_list[z].round_status=="All_In":
+                
+                print("All_In continue")
                 z=(z+1)%len(players_list)
                 continue
+
+            if stop_next_turn:
+                break
+           
+            
+           
+                
             for widgets in root.winfo_children():
                 widgets.destroy()
             self.cont=tkinter.IntVar()
@@ -498,22 +541,22 @@ class Hand():
             current_pot_label["text"]="Current pot is "+str(self.hand_pot)
             current_pot_label.place(relx=0.15,rely=0.7,anchor="center")
             try_next_card=True
-            print(self.community_cards)
+            #print(self.community_cards)
 
             def set_image_to_card(card):
-                print('This is card ',card)
+                #print('This is card ',card)
                 community_card_number=self.community_cards[card].number
-                print("This is community_card_number",community_card_number)
+                #print("This is community_card_number",community_card_number)
 
                 community_card_suit=self.community_cards[card].suit
-                print("This is community_card_suit",community_card_suit)
-                print("check")
+                #print("This is community_card_suit",community_card_suit)
+                #print("check")
                 new_community_card_number=community_card_number.lower()
                 new_community_card_suit=community_card_suit.lower()
-                print("check2")
+                #print("check2")
 
                 image_to_open=f"{new_community_card_number}_of_{new_community_card_suit}.png"
-                print("This is image to open",image_to_open)
+                #print("This is image to open",image_to_open)
                 return image_to_open
             
             try:
@@ -628,7 +671,6 @@ class Hand():
                 print("Name:",x.name,"Card 1",x.card_one.number,x.card_one.suit,"Card 2",x.card_two.number,x.card_two.suit)     
             cont=self.round_check(players_list,root)
             print(cont)
-            
             if cont=="YES":
                 continue
             elif cont=="NO":

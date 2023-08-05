@@ -155,12 +155,6 @@ class Game():
 
         cash_in_button=tkinter.Button(root,text="Cash In",command= lambda :self.cash_in(self.player_list,root,show_players))
         cash_in_button.place(relx=0.3,rely=0.5,anchor="center")
-
-       
-        
-       
-
-        
         
         self.cont2=tkinter.IntVar()
         def cont2():
@@ -175,10 +169,22 @@ class Game():
         next_button2.place(relx=0.5,rely=0.8,anchor="center")
 
         root.wait_variable(self.cont2)
+        for x in self.player_list:
+            x.player_bet=0
+            x.player_bet_hand=0
+            x.round_status=None
+            x.card_one=None
+            x.card_two=None
+        
         for widgets in root.winfo_children():
             widgets.destroy()
+        self.player_list=self.remove_player_out_of_game(self.player_list)
 
+        print(len(self.player_list))
+        number=1
         while len(self.player_list)>1:
+            number=number+1
+            print("In Round number",number)
             for p in self.player_list:
                 p.player_bet=0
             self.player_list=self.remove_player_out_of_game(self.player_list)
@@ -199,7 +205,52 @@ class Game():
             hand.flop(root)
             hand.turn(root)
             hand.river(root)
+            self.cont=tkinter.IntVar()
+            def cont():
+                self.cont.set(1)
 
+            next_button=tkinter.Button(root,text="next",command=cont)
+            next_button.place(relx=0.5,rely=0.8,anchor="center")
+        
+            
+            root.wait_variable(self.cont)
+            for widgets in root.winfo_children():
+                widgets.destroy()
+            
+            self.clicked=False
+            self.clicked2=False
+            print(self.clicked2)
+
+            show_label=tkinter.Label(root,text="Player Cash-In,Cash-Out",font=("Times 15"))
+            show_label.place(relx=0.5,rely=0.1,anchor="center")
+
+
+            show_players=tkinter.Text(root,height=5,width=40,yscrollcommand=True,xscrollcommand=True)
+            show_players.place(relx=0.5,rely=0.3,anchor="center")
+            show_players.config(state=("disabled"))
+
+
+            for x in self.player_list:
+                
+                add_thing="Player "+x.name+" has amount "+str(x.money)+"\n"
+                show_players.config(state=("normal"))
+                show_players.insert(tkinter.END,add_thing)
+                show_players.config(state=("disabled"))
+
+            cash_out_button=tkinter.Button(root,text="Cash Out",command= lambda :self.cash_out(self.player_list,root,show_players))
+            cash_out_button.place(relx=0.7,rely=0.5,anchor="center")
+
+            cash_in_button=tkinter.Button(root,text="Cash In",command= lambda :self.cash_in(self.player_list,root,show_players))
+            cash_in_button.place(relx=0.3,rely=0.5,anchor="center")
+            
+            for x in self.player_list:
+                x.player_bet=0
+                x.player_bet_hand=0
+                x.round_status=None
+                x.card_one=None
+                x.card_two=None
+            if len(self.player_list)==1:
+                break
         
         print("Game Over")
         print("Player",player_list[0].name,"is the winner")
