@@ -394,8 +394,10 @@ class Hand():
         z=self.blinds_check(blinds,players_list)
         stop_next_turn=False
         while z < len(players_list):
+            
             for x in players_list:
                 print(x.name,"round status :",x.round_status)
+            
             j=0 
             for x in players_list:
                 if x.round_status=="All_In":
@@ -410,17 +412,22 @@ class Hand():
             
             if players_list[z].round_status=="Fold":
                 #print("This is fold z",z)
-                
                 z=(z+1)%len(players_list)
                 continue
             elif players_list[z].round_status=="All_In":
-                
                 print("All_In continue")
                 z=(z+1)%len(players_list)
                 continue
-
-            if stop_next_turn:
-                break
+            if blinds!="YES":
+                if self.round_pot==0:
+                    if stop_next_turn:
+                        break
+            
+                
+            
+            
+            
+                
            
             
            
@@ -671,6 +678,7 @@ class Hand():
                 print("Name:",x.name,"Card 1",x.card_one.number,x.card_one.suit,"Card 2",x.card_two.number,x.card_two.suit)     
             cont=self.round_check(players_list,root)
             print(cont)
+            
             if cont=="YES":
                 continue
             elif cont=="NO":
