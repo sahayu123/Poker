@@ -422,16 +422,7 @@ class Hand():
                 if self.round_pot==0:
                     if stop_next_turn:
                         break
-            
-                
-            
-            
-            
-                
-           
-            
-           
-                
+                        
             for widgets in root.winfo_children():
                 widgets.destroy()
             self.cont=tkinter.IntVar()
