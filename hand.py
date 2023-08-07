@@ -328,11 +328,13 @@ class Hand():
                         if g.round_status!="Fold":
                             g.round_status="Won_hand"
                             g.money=g.money+self.hand_pot
+                            g.u=self.hand_pot
                             print(g.name,"wins")
                             print(g.name,"has amount",g.money)
                             stab="NO" 
-                            break
-            
+                   
+                    
+                   
 
                                         
         for v in players_list:

@@ -120,6 +120,32 @@ class Game():
         hand.flop(root)
         hand.turn(root)
         hand.river(root)
+        print("asdasdasdas",len(self.player_list))
+        for x in self.player_list:
+            if x.round_status=="Won_hand":
+                player_money_display=tkinter.Text(root,height=8,width=50,yscrollcommand=True,xscrollcommand=True)
+                player_money_display.place(relx=0.5,rely=0.3,anchor="center")
+                player_money_display.config(state=("disabled"))
+                title_label=tkinter.Label(root,text="Winner(s) and Loser(s)",font=("Times 21"))
+                title_label.place(relx=0.5,rely=0.1,anchor="center")
+                
+                player_money_display.config(state=("normal"))
+                winner_info=x.name + " has won amount "+str(x.u)+" and has amount "+str(x.money)+"\n"
+                player_money_display.insert(tkinter.END,winner_info)
+                player_money_display.insert(tkinter.END,"-------------------------------------------------- \n")
+                player_money_display.config(state=("disabled"))
+
+                for p in self.player_list:
+                    if p==x:
+                        continue 
+                    else:
+                        loser_info=p.name+" has lost and has amount "+str(p.money)+"\n"
+                        print(loser_info)
+                        player_money_display.config(state=("normal"))
+                        player_money_display.insert(tkinter.END,loser_info)
+                        player_money_display.config(state=("disabled"))
+                break
+            
         self.cont=tkinter.IntVar()
         def cont():
             self.cont.set(1)
@@ -127,8 +153,16 @@ class Game():
         next_button=tkinter.Button(root,text="next",command=cont)
         next_button.place(relx=0.5,rely=0.8,anchor="center")
        
-        
+        def on_close():
+            self.cont.set(1)
+            root.destroy()
+
+        root.protocol("WM_DELETE_WINDOW", on_close)
+
         root.wait_variable(self.cont)
+
+        
+
         for widgets in root.winfo_children():
             widgets.destroy()
         self.clicked=False
@@ -156,19 +190,12 @@ class Game():
         cash_in_button=tkinter.Button(root,text="Cash In",command= lambda :self.cash_in(self.player_list,root,show_players))
         cash_in_button.place(relx=0.3,rely=0.5,anchor="center")
         
-        self.cont2=tkinter.IntVar()
-        def cont2():
-            if self.clicked:
-                pass
-            elif self.clicked2:
-                pass
-            else:
-                self.cont2.set(1)
-
-        next_button2=tkinter.Button(root,text="next",command=cont2)
+        self.cont=tkinter.IntVar()
+        
+        next_button2=tkinter.Button(root,text="next",command=cont)
         next_button2.place(relx=0.5,rely=0.8,anchor="center")
 
-        root.wait_variable(self.cont2)
+        root.wait_variable(self.cont)
         for x in self.player_list:
             x.player_bet=0
             x.player_bet_hand=0
@@ -182,6 +209,7 @@ class Game():
 
         print(len(self.player_list))
         number=1
+        
         while len(self.player_list)>1:
             number=number+1
             print("In Round number",number)
@@ -205,6 +233,32 @@ class Game():
             hand.flop(root)
             hand.turn(root)
             hand.river(root)
+            
+            for x in self.player_list:
+                if x.round_status=="Won_hand":
+                    player_money_display=tkinter.Text(root,height=8,width=50,yscrollcommand=True,xscrollcommand=True)
+                    player_money_display.place(relx=0.5,rely=0.3,anchor="center")
+                    player_money_display.config(state=("disabled"))
+                    title_label=tkinter.Label(root,text="Winner(s) and Loser(s)",font=("Times 21"))
+                    title_label.place(relx=0.5,rely=0.1,anchor="center")
+                    
+                    player_money_display.config(state=("normal"))
+                    winner_info=x.name + " has won amount "+str(x.u)+" and has amount "+str(x.money)+"\n"
+                    player_money_display.insert(tkinter.END,winner_info)
+                    player_money_display.insert(tkinter.END,"-------------------------------------------------- \n")
+                    player_money_display.config(state=("disabled"))
+
+                    for p in self.player_list:
+                        if p==x:
+                            continue 
+                        else:
+                            loser_info=p.name+" has lost and has amount "+str(p.money)+"\n"
+                            print(loser_info)
+                            player_money_display.config(state=("normal"))
+                            player_money_display.insert(tkinter.END,loser_info)
+                            player_money_display.config(state=("disabled"))
+                    break
+            
             self.cont=tkinter.IntVar()
             def cont():
                 self.cont.set(1)
@@ -216,6 +270,7 @@ class Game():
             root.wait_variable(self.cont)
             for widgets in root.winfo_children():
                 widgets.destroy()
+            #00000000000000000000000000000000000000000000000000000000000000000000000
             
             self.clicked=False
             self.clicked2=False
@@ -242,6 +297,12 @@ class Game():
 
             cash_in_button=tkinter.Button(root,text="Cash In",command= lambda :self.cash_in(self.player_list,root,show_players))
             cash_in_button.place(relx=0.3,rely=0.5,anchor="center")
+
+            self.cont=tkinter.IntVar()
+        
+            next_button2=tkinter.Button(root,text="next",command=cont)
+            next_button2.place(relx=0.5,rely=0.8,anchor="center")
+            root.wait_variable(self.cont)
             
             for x in self.player_list:
                 x.player_bet=0
